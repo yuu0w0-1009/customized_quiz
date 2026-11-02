@@ -82,6 +82,13 @@ File loading page
 
 ---
 
+## To Do List
+
+1. Import JSON directly from a GitHub URL
+2. Import multiple quiz banks
+
+---
+
 ## Changelog
 
 - v1.2 Added a light/dark mode toggle (your choice is remembered) and optimized UI
