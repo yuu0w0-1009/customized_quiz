@@ -1,4 +1,4 @@
-# 自訂題庫測驗v1.0
+# [自訂題庫測驗v1.0](https://yuu0w0-1009.github.io/customized_quiz/)
 **中文** ｜ [English](README.en.md)
 
 一個純前端的「自訂題庫測驗」靜態網站
