@@ -42,7 +42,19 @@
     border-radius:14px;
     box-shadow:var(--shadow);
     padding:24px;
+    position:relative;
   }
+
+  /* ---------- 語言切換 ---------- */
+  .lang-switch{position:absolute;top:14px;right:14px;z-index:1;}
+  .lang-switch select{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--text);
+    background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:6px 10px;cursor:pointer;
+  }
+  .lang-switch select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+  #screen-upload h1{padding-right:118px;}
+  .lbl{margin-right:6px;}
 
   h1{font-size:24px;margin:0 0 6px;}
   h2{font-size:18px;margin:0 0 12px;}
@@ -196,13 +208,19 @@
   <!-- ========== 1. 檔案讀取頁 ========== -->
   <section id="screen-upload" class="screen">
     <div class="card">
-      <h1>自訂題庫測驗 v1.0</h1>
-      <p class="sub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
+      <div class="lang-switch">
+        <select id="langSelect" aria-label="Language">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.0</h1>
+      <p class="sub" data-i18n="uploadSub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
 
       <div class="drop" id="dropZone">
-        <div class="drop-title">選擇題庫檔案</div>
-        <div class="drop-hint">將 .json 檔案拖拽到這裡，或點擊下方按鈕選擇</div>
-        <button class="btn btn-primary" id="btnPick">選擇 JSON 檔案</button>
+        <div class="drop-title" data-i18n="dropTitle">選擇題庫檔案</div>
+        <div class="drop-hint" data-i18n="dropHint">將 .json 檔案拖拽到這裡，或點擊下方按鈕選擇</div>
+        <button class="btn btn-primary" id="btnPick" data-i18n="btnPick">選擇 JSON 檔案</button>
         <input type="file" id="fileInput" accept=".json,application/json">
       </div>
 
@@ -211,13 +229,13 @@
       <div class="upload-actions">
         <label class="check" id="shuffleWrap" hidden>
           <input type="checkbox" id="shuffleCheck">
-          <span>打亂題目</span>
+          <span data-i18n="shuffleLabel">打亂題目</span>
         </label>
-        <button class="btn btn-sm" id="btnSample">下載範例 JSON</button>
+        <button class="btn btn-sm" id="btnSample" data-i18n="btnSample">下載範例 JSON</button>
       </div>
 
       <div class="fmt">
-        <div style="font-weight:700;margin-bottom:6px;color:#334155;">JSON 格式範例</div>
+        <div style="font-weight:700;margin-bottom:6px;color:#334155;" data-i18n="fmtTitle">JSON 格式範例</div>
         <pre id="fmtSample"></pre>
       </div>
     </div>
@@ -234,7 +252,7 @@
       <p class="qtext" id="quizText"></p>
       <div class="options" id="quizOptions"></div>
       <div class="qnav">
-        <button class="btn" id="btnPrev">上一題</button>
+        <button class="btn" id="btnPrev" data-i18n="btnPrev">上一題</button>
         <button class="btn btn-primary" id="btnNext">下一題</button>
       </div>
     </div>
@@ -251,17 +269,17 @@
         </div>
 
         <div class="card" style="margin-top:20px;">
-          <h2 id="wrongTitle">錯題（含未作答）</h2>
+          <h2 id="wrongTitle" data-i18n="wrongTitle">錯題（含未作答）</h2>
           <div id="wrongList"></div>
         </div>
       </div>
 
       <div class="side">
         <div class="card" style="padding:16px;">
-          <div style="font-weight:700;margin-bottom:12px;">功能</div>
-          <button class="btn btn-primary btn-block" id="btnReview" style="margin-bottom:10px;">觀看全部詳解</button>
-          <button class="btn btn-block" id="btnRetry" style="margin-bottom:10px;">重新開始答題</button>
-          <button class="btn btn-block" id="btnRestart">從頭開始</button>
+          <div style="font-weight:700;margin-bottom:12px;" data-i18n="sideTitle">功能</div>
+          <button class="btn btn-primary btn-block" id="btnReview" style="margin-bottom:10px;" data-i18n="btnReview">觀看全部詳解</button>
+          <button class="btn btn-block" id="btnRetry" style="margin-bottom:10px;" data-i18n="btnRetry">重新開始答題</button>
+          <button class="btn btn-block" id="btnRestart" data-i18n="btnRestart">從頭開始</button>
         </div>
       </div>
     </div>
@@ -279,16 +297,16 @@
       <div class="options" id="revOptions"></div>
       <div class="answer-box" id="revAnswerBox">
         <div>
-          <span class="label">你的選擇：</span><span id="revMineText"></span>
-          　<span class="label">正確答案：</span><span id="revAnswerText"></span>
+          <span class="label" data-i18n="labelYourAnswer">你的選擇：</span><span id="revMineText"></span>
+          <span class="label" style="margin-left:14px;" data-i18n="labelCorrect">正確答案：</span><span id="revAnswerText"></span>
         </div>
         <div class="explain">
-          <span class="label">詳解</span>
+          <span class="label" data-i18n="labelExplain">詳解</span>
           <div class="body" id="revExplain"></div>
         </div>
       </div>
       <div class="qnav">
-        <button class="btn" id="revPrev">上一題</button>
+        <button class="btn" id="revPrev" data-i18n="btnPrev">上一題</button>
         <button class="btn btn-primary" id="revNext">下一題</button>
       </div>
     </div>
@@ -299,12 +317,12 @@
 <!-- ========== 3. 交卷檢查彈窗 ========== -->
 <div class="overlay" id="modalOverlay" hidden>
   <div class="modal">
-    <h3>還有題目未作答</h3>
-    <p>以下題號尚未作答，未作答將以答錯計算：</p>
+    <h3 data-i18n="modalTitle">還有題目未作答</h3>
+    <p data-i18n="modalDesc">以下題號尚未作答，未作答將以答錯計算：</p>
     <p class="nos" id="modalNos"></p>
     <div class="modal-actions">
-      <button class="btn" id="btnKeep">繼續答題</button>
-      <button class="btn btn-danger" id="btnForceSubmit">確認交卷</button>
+      <button class="btn" id="btnKeep" data-i18n="btnKeep">繼續答題</button>
+      <button class="btn btn-danger" id="btnForceSubmit" data-i18n="btnForceSubmit">確認交卷</button>
     </div>
   </div>
 </div>
@@ -314,6 +332,145 @@
   'use strict';
 
   var LABELS = ['A','B','C','D'];
+
+  /* ---------------- 多語系 ---------------- */
+  var I18N = {
+    zh: {
+      uploadTitle:'自訂題庫測驗 v1.0',
+      uploadSub:'上傳符合格式的 JSON 題庫檔案，即可開始測驗。',
+      dropTitle:'選擇題庫檔案',
+      dropHint:'將 .json 檔案拖拽到這裡，或點擊下方按鈕選擇',
+      btnPick:'選擇 JSON 檔案',
+      shuffleLabel:'打亂題目',
+      btnSample:'下載範例 JSON',
+      fmtTitle:'JSON 格式範例',
+      quizNo:'第 {n} 題',
+      quizTotal:'共 {t} 題（進度 {i}/{t}）',
+      btnPrev:'上一題',
+      btnNext:'下一題',
+      btnSubmit:'交卷',
+      btnEnd:'結束',
+      modalTitle:'還有題目未作答',
+      modalDesc:'以下題號尚未作答，未作答將以答錯計算：',
+      modalNos:'第 {list} 題尚未作答',
+      btnKeep:'繼續答題',
+      btnForceSubmit:'確認交卷',
+      wrongTitle:'錯題（含未作答）',
+      wrongHeadCount:'錯題（含未作答）　共 {n} 題',
+      sideTitle:'功能',
+      btnReview:'觀看全部詳解',
+      btnRetry:'重新開始答題',
+      btnRestart:'從頭開始',
+      scoreDetail:'答對 {c} 題 / 共 {t} 題',
+      allCorrect:'恭喜全對！',
+      noWrong:'本次測驗沒有錯題。',
+      labelYourAnswer:'你的選擇：',
+      labelCorrect:'正確答案：',
+      labelExplain:'詳解',
+      labelExplain2:'詳解：',
+      notAnswered:'未作答',
+      noExplain:'（無提供詳解）',
+      noAnswer:'（未提供）',
+      tagCorrect:'正確答案',
+      tagYour:'你的選擇',
+      defaultTitle:'(此題無題目內容)',
+      errExt:'僅支援 .json 檔案，請重新選擇。',
+      errRead:'檔案讀取失敗，請重新選擇檔案。',
+      errGeneric:'讀取失敗，請確認檔案內容是否正確。',
+      errJson:'JSON 格式解析失敗，請確認檔案內容為有效的 JSON。',
+      errTopObject:'格式錯誤：JSON 最外層必須是物件。',
+      errNoList:'格式錯誤：找不到「題目」陣列。',
+      errEmptyList:'格式錯誤：「題目」陣列為空，請至少放入一題。',
+      okMsg:'讀取成功：{file}，共 {n} 題（題庫總題數以「題目」陣列長度 {n} 為準）。',
+      btnStart:'開始測驗',
+      listSep:'、'
+    },
+    en: {
+      uploadTitle:'Custom Quiz v1.0',
+      uploadSub:'Upload a question bank JSON file in the required format to start the quiz.',
+      dropTitle:'Choose a question bank file',
+      dropHint:'Drag a .json file here, or click the button below to choose one',
+      btnPick:'Choose JSON File',
+      shuffleLabel:'Shuffle questions',
+      btnSample:'Download Sample JSON',
+      fmtTitle:'JSON Format Example',
+      quizNo:'Question {n}',
+      quizTotal:'{t} question(s) in total (progress {i}/{t})',
+      btnPrev:'Previous',
+      btnNext:'Next',
+      btnSubmit:'Submit',
+      btnEnd:'Finish',
+      modalTitle:'Unanswered Questions',
+      modalDesc:'The following questions are unanswered. Unanswered questions will be counted as incorrect:',
+      modalNos:'Question {list} not answered',
+      btnKeep:'Keep Answering',
+      btnForceSubmit:'Submit Anyway',
+      wrongTitle:'Wrong Answers (including unanswered)',
+      wrongHeadCount:'Wrong Answers (including unanswered) — {n} total',
+      sideTitle:'Actions',
+      btnReview:'View All Explanations',
+      btnRetry:'Retake Quiz',
+      btnRestart:'Start Over',
+      scoreDetail:'{c} correct out of {t} questions',
+      allCorrect:'Perfect score!',
+      noWrong:'No wrong answers in this quiz.',
+      labelYourAnswer:'Your answer:',
+      labelCorrect:'Correct answer:',
+      labelExplain:'Explanation',
+      labelExplain2:'Explanation:',
+      notAnswered:'Not answered',
+      noExplain:'(No explanation provided)',
+      noAnswer:'(Not provided)',
+      tagCorrect:'Correct',
+      tagYour:'Your choice',
+      defaultTitle:'(No question text)',
+      errExt:'Only .json files are supported. Please choose again.',
+      errRead:'Failed to read the file. Please choose again.',
+      errGeneric:'Failed to load. Please check the file content.',
+      errJson:'Failed to parse JSON. Please make sure the file contains valid JSON.',
+      errTopObject:'Format error: the top-level JSON value must be an object.',
+      errNoList:'Format error: cannot find the question list.',
+      errEmptyList:'Format error: the question list is empty. Please add at least one question.',
+      okMsg:'Loaded: {file} — {n} question(s) in total.',
+      btnStart:'Start Quiz',
+      listSep:', '
+    }
+  };
+
+  var lang = 'zh';
+  var activeScreen = 'screen-upload';
+  var lastUpload = null;   // {kind:'ok', fileName, count} | {kind:'error', key}
+
+  function T(key, params){
+    var dict = I18N[lang] || I18N.zh;
+    var s = dict[key];
+    if(s === undefined) s = I18N.zh[key];
+    if(s === undefined) return key;
+    if(params){
+      Object.keys(params).forEach(function(p){
+        s = s.split('{' + p + '}').join(params[p]);
+      });
+    }
+    return s;
+  }
+
+  // 套用所有 data-i18n 標記的靜態文字
+  function applyStatic(){
+    var els = document.querySelectorAll('[data-i18n]');
+    for(var i=0;i<els.length;i++){
+      els[i].textContent = T(els[i].getAttribute('data-i18n'));
+    }
+    document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : 'en';
+    document.title = T('uploadTitle');
+  }
+
+  // 重新渲染目前畫面的動態文字
+  function rerenderActive(){
+    if(activeScreen === 'screen-quiz') renderQuiz();
+    else if(activeScreen === 'screen-result') renderResult();
+    else if(activeScreen === 'screen-review') renderReview();
+    else renderUploadMsg();
+  }
 
   /* ---------------- 狀態 ---------------- */
   var state = {
@@ -350,6 +507,7 @@
   }
 
   function showScreen(name){
+    activeScreen = name;
     ['screen-upload','screen-quiz','screen-result','screen-review'].forEach(function(id){
       $(id).hidden = (id !== name);
     });
@@ -358,40 +516,71 @@
 
   /* ---------------- 範例 JSON ---------------- */
   var SAMPLE = {
-    "題目數": 3,
-    "題目": [
-      {
-        "題號": 1,
-        "題目": "已知 a = 1、b = 2，則 a + b = ?",
-        "A": "1", "B": "2", "C": "3", "D": "4",
-        "答案": "C",
-        "詳解": "將 a = 1 與 b = 2 相加，1 + 2 = 3，故選 C。"
-      },
-      {
-        "題號": 2,
-        "題目": "已知 c = 3、d = 4，則 d - c = ?",
-        "A": "1", "B": "2", "C": "3", "D": "4",
-        "答案": "A",
-        "詳解": "將 d = 4 減去 c = 3，4 - 3 = 1，故選 A。"
-      },
-      {
-        "題號": 3,
-        "題目": "下列何者是質數？",
-        "A": "9", "B": "15", "C": "21", "D": "17",
-        "答案": "D",
-        "詳解": "9、15、21 皆可被 3 整除，只有 17 除了 1 與自身外沒有其他因數，故選 D。"
-      }
-    ]
+    zh: {
+      "題目數": 3,
+      "題目": [
+        {
+          "題號": 1,
+          "題目": "已知 a = 1、b = 2，則 a + b = ?",
+          "A": "1", "B": "2", "C": "3", "D": "4",
+          "答案": "C",
+          "詳解": "將 a = 1 與 b = 2 相加，1 + 2 = 3，故選 C。"
+        },
+        {
+          "題號": 2,
+          "題目": "已知 c = 3、d = 4，則 d - c = ?",
+          "A": "1", "B": "2", "C": "3", "D": "4",
+          "答案": "A",
+          "詳解": "將 d = 4 減去 c = 3，4 - 3 = 1，故選 A。"
+        },
+        {
+          "題號": 3,
+          "題目": "下列何者是質數？",
+          "A": "9", "B": "15", "C": "21", "D": "17",
+          "答案": "D",
+          "詳解": "9、15、21 皆可被 3 整除，只有 17 除了 1 與自身外沒有其他因數，故選 D。"
+        }
+      ]
+    },
+    en: {
+      "questions": [
+        {
+          "id": 1,
+          "question": "Given a = 1 and b = 2, what is a + b?",
+          "A": "1", "B": "2", "C": "3", "D": "4",
+          "answer": "C",
+          "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
+        },
+        {
+          "id": 2,
+          "question": "Given c = 3 and d = 4, what is d - c?",
+          "A": "1", "B": "2", "C": "3", "D": "4",
+          "answer": "A",
+          "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is A."
+        },
+        {
+          "id": 3,
+          "question": "Which of the following is a prime number?",
+          "A": "9", "B": "15", "C": "21", "D": "17",
+          "answer": "D",
+          "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is D."
+        }
+      ]
+    }
   };
 
-  $('fmtSample').textContent = JSON.stringify(SAMPLE, null, 4);
+  function currentSample(){ return SAMPLE[lang] || SAMPLE.zh; }
+
+  function renderSample(){
+    $('fmtSample').textContent = JSON.stringify(currentSample(), null, 4);
+  }
 
   $('btnSample').addEventListener('click', function(){
-    var blob = new Blob([JSON.stringify(SAMPLE, null, 4)], {type:'application/json;charset=utf-8'});
+    var blob = new Blob([JSON.stringify(currentSample(), null, 4)], {type:'application/json;charset=utf-8'});
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'example.json';
+    a.download = (lang === 'en') ? 'example_eng.json' : 'example.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -443,7 +632,7 @@
 
   function handleFile(file){
     if(!/\.json$/i.test(file.name)){
-      failUpload('僅支援 .json 檔案，請重新選擇。');
+      failUpload('errExt');
       return;
     }
     var reader = new FileReader();
@@ -452,11 +641,11 @@
         var questions = parseBank(ev.target.result);
         successUpload(questions, file.name);
       }catch(err){
-        failUpload(err && err.message ? err.message : '讀取失敗，請確認檔案內容是否正確。');
+        failUpload(err && err.__i18n ? err.__i18n : 'errGeneric');
       }
     };
     reader.onerror = function(){
-      failUpload('檔案讀取失敗，請重新選擇檔案。');
+      failUpload('errRead');
     };
     reader.readAsText(file, 'UTF-8');
   }
@@ -466,15 +655,31 @@
     $('uploadMsg').innerHTML = '';
     $('shuffleCheck').checked = false;
     $('shuffleWrap').hidden = true;
+    lastUpload = null;
     state.questions = [];
     state.answers = [];
     state.qi = 0;
     state.ri = 0;
   }
 
-  function failUpload(msg){
+  function renderUploadMsg(){
+    var el = $('uploadMsg');
+    if(!lastUpload){ el.innerHTML = ''; return; }
+    if(lastUpload.kind === 'error'){
+      el.innerHTML = '<div class="msg msg-error">' + esc(T(lastUpload.key)) + '</div>';
+      return;
+    }
+    el.innerHTML =
+      '<div class="msg msg-ok">' + esc(T('okMsg', {file:lastUpload.fileName, n:lastUpload.count})) +
+      '<div style="margin-top:12px;text-align:right;">' +
+      '<button class="btn btn-primary" id="btnStart">' + esc(T('btnStart')) + '</button></div></div>';
+    $('btnStart').addEventListener('click', startQuiz);
+  }
+
+  function failUpload(key){
     resetUploadState();
-    $('uploadMsg').innerHTML = '<div class="msg msg-error">' + esc(msg) + '</div>';
+    lastUpload = {kind:'error', key:key};
+    renderUploadMsg();
   }
 
   function successUpload(questions, fileName){
@@ -482,12 +687,8 @@
     state.questions = questions;
     state.answers = new Array(questions.length).fill(null);
     $('shuffleWrap').hidden = false;
-    $('uploadMsg').innerHTML =
-      '<div class="msg msg-ok">讀取成功：' + esc(fileName) + '，共 ' + questions.length +
-      ' 題（題庫總題數以「題目」陣列長度 ' + questions.length + ' 為準）。' +
-      '<div style="margin-top:12px;text-align:right;">' +
-      '<button class="btn btn-primary" id="btnStart">開始測驗</button></div></div>';
-    $('btnStart').addEventListener('click', startQuiz);
+    lastUpload = {kind:'ok', fileName:fileName, count:questions.length};
+    renderUploadMsg();
   }
 
   // 開始（或重新開始）一次測驗
@@ -507,6 +708,12 @@
     return arr;
   }
 
+  function parseErr(key){
+    var e = new Error(key);
+    e.__i18n = key;
+    return e;
+  }
+
   function parseBank(text){
     // 移除所有 BOM（有些編輯器會把 BOM 寫進 Key 前面，導致解析失敗）
     var clean = String(text).replace(/\uFEFF/g, '');
@@ -514,17 +721,17 @@
     try{
       data = JSON.parse(clean);
     }catch(e){
-      throw new Error('JSON 格式解析失敗，請確認檔案內容為有效的 JSON。');
+      throw parseErr('errJson');
     }
     if(!data || typeof data !== 'object' || Array.isArray(data)){
-      throw new Error('格式錯誤：JSON 最外層必須是物件。');
+      throw parseErr('errTopObject');
     }
     var list = pick(data, ['題目','题目','questions']);
     if(!Array.isArray(list)){
-      throw new Error('格式錯誤：找不到「題目」陣列。');
+      throw parseErr('errNoList');
     }
     if(list.length === 0){
-      throw new Error('格式錯誤：「題目」陣列為空，請至少放入一題。');
+      throw parseErr('errEmptyList');
     }
     return list.map(function(raw, i){
       var no = pick(raw, ['題號','题号','id','no']);
@@ -535,7 +742,7 @@
       });
       return {
         no: toText(no),
-        title: toText(pick(raw, ['題目','题目','question','title'])) || '(此題無題目內容)',
+        title: toText(pick(raw, ['題目','题目','question','title'])) || T('defaultTitle'),
         options: opts,
         answer: toText(pick(raw, ['答案','answer'])).toUpperCase(),
         explain: toText(pick(raw, ['詳解','详解','解析','explanation']))
@@ -546,8 +753,8 @@
   /* ---------------- 共用：渲染題目卡 ---------------- */
   function fillMeta(noEl, totalEl, barEl, index, total){
     // 題號一律依「測驗呈現順序」編號，避免打亂題目後題號跳號
-    noEl.textContent = '第 ' + (index + 1) + ' 題';
-    totalEl.textContent = '共 ' + total + ' 題（進度 ' + (index + 1) + '/' + total + '）';
+    noEl.textContent = T('quizNo', {n: index + 1});
+    totalEl.textContent = T('quizTotal', {t: total, i: index + 1});
     barEl.style.width = ((index + 1) / total * 100) + '%';
   }
 
@@ -578,10 +785,10 @@
     $('btnPrev').disabled = (state.qi === 0);
     var next = $('btnNext');
     if(state.qi === total - 1){
-      next.textContent = '交卷';
+      next.textContent = T('btnSubmit');
       next.className = 'btn btn-danger';
     }else{
-      next.textContent = '下一題';
+      next.textContent = T('btnNext');
       next.className = 'btn btn-primary';
     }
   }
@@ -616,7 +823,7 @@
     }
     // missing 為索引升序，轉成「第 N 題」後即依測驗順序排列
     var nos = missing.map(function(i){ return i + 1; });
-    $('modalNos').textContent = '第 ' + nos.join('、') + ' 題尚未作答';
+    $('modalNos').textContent = T('modalNos', {list: nos.join(T('listSep'))});
     $('modalOverlay').hidden = false;
   }
 
@@ -646,12 +853,12 @@
     var rateText = (Math.round(raw * 10) / 10).toString().replace(/\.0$/, '') + '%';
 
     $('scoreRate').textContent = rateText;
-    $('scoreDetail').textContent = '答對 ' + correct + ' 題 / 共 ' + total + ' 題';
+    $('scoreDetail').textContent = T('scoreDetail', {c: correct, t: total});
     $('scoreRing').style.background =
       'conic-gradient(var(--primary) ' + (raw * 3.6) + 'deg, #e2e8f0 ' + (raw * 3.6) + 'deg)';
 
     $('allCorrect').innerHTML = (correct === total)
-      ? '<div class="banner-ok">恭喜全對！</div>'
+      ? '<div class="banner-ok">' + esc(T('allCorrect')) + '</div>'
       : '';
 
     var wrong = [];
@@ -659,25 +866,27 @@
       if(!state.answers[i] || state.answers[i] !== q.answer) wrong.push(i);
     });
 
-    $('wrongTitle').textContent = '錯題（含未作答）　共 ' + wrong.length + ' 題';
+    $('wrongTitle').textContent = T('wrongHeadCount', {n: wrong.length});
 
     var list = $('wrongList');
     if(wrong.length === 0){
-      list.innerHTML = '<p style="color:var(--muted);margin:0;">本次測驗沒有錯題。</p>';
+      list.innerHTML = '<p style="color:var(--muted);margin:0;">' + esc(T('noWrong')) + '</p>';
     }else{
       list.innerHTML = wrong.map(function(i){
         var q = state.questions[i];
         var mine = state.answers[i];
         return '' +
         '<div class="wrong-item">' +
-          '<div class="wrong-head"><span class="no">第 ' + (i + 1) + ' 題</span>' +
+          '<div class="wrong-head"><span class="no">' + esc(T('quizNo', {n: i + 1})) + '</span>' +
             '<span>' + esc(q.title) + '</span></div>' +
           '<div class="wrong-body">' +
-            '<p class="kv">你的選擇：<b class="' + (mine ? 'bad' : '') + '">' +
-              (mine ? esc(mine) + '. ' + esc(q.options[mine] || '') : '未作答') + '</b></p>' +
-            '<p class="kv">正確答案：<b class="good">' + esc(q.answer) + '. ' +
-              esc(q.options[q.answer] || '') + '</b></p>' +
-            '<div class="wrong-explain"><b>詳解：</b>' + esc(q.explain || '（無提供詳解）') + '</div>' +
+            '<p class="kv"><b class="lbl">' + esc(T('labelYourAnswer')) + '</b>' +
+              '<b class="' + (mine ? 'bad' : '') + '">' +
+              (mine ? esc(mine) + '. ' + esc(q.options[mine] || '') : esc(T('notAnswered'))) + '</b></p>' +
+            '<p class="kv"><b class="lbl">' + esc(T('labelCorrect')) + '</b><b class="good">' +
+              esc(q.answer) + '. ' + esc(q.options[q.answer] || '') + '</b></p>' +
+            '<div class="wrong-explain"><b class="lbl">' + esc(T('labelExplain2')) + '</b>' +
+              esc(q.explain || T('noExplain')) + '</div>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -718,10 +927,10 @@
       var tag = '';
       if(l === q.answer){
         cls = 'option correct';
-        tag = '<span class="tag tag-ok">正確答案</span>';
+        tag = '<span class="tag tag-ok">' + esc(T('tagCorrect')) + '</span>';
       }else if(mine === l){
         cls = 'option wrong';
-        tag = '<span class="tag tag-no">你的選擇</span>';
+        tag = '<span class="tag tag-no">' + esc(T('tagYour')) + '</span>';
       }
       var btn = document.createElement('button');
       btn.className = cls;
@@ -733,17 +942,17 @@
 
     var boxEl = $('revAnswerBox');
     boxEl.className = 'answer-box ' + (isRight ? 'ok' : 'no');
-    $('revMineText').textContent = mine ? mine : '未作答';
-    $('revAnswerText').textContent = q.answer || '（未提供）';
-    $('revExplain').textContent = q.explain || '（無提供詳解）';
+    $('revMineText').textContent = mine ? mine : T('notAnswered');
+    $('revAnswerText').textContent = q.answer || T('noAnswer');
+    $('revExplain').textContent = q.explain || T('noExplain');
 
     $('revPrev').disabled = (state.ri === 0);
     var next = $('revNext');
     if(state.ri === total - 1){
-      next.textContent = '結束';
+      next.textContent = T('btnEnd');
       next.className = 'btn btn-primary';
     }else{
-      next.textContent = '下一題';
+      next.textContent = T('btnNext');
       next.className = 'btn btn-primary';
     }
   }
@@ -762,7 +971,17 @@
     }
   });
 
+  /* ---------------- 語言切換 ---------------- */
+  $('langSelect').addEventListener('change', function(){
+    lang = (this.value === 'en') ? 'en' : 'zh';
+    applyStatic();
+    renderSample();
+    rerenderActive();
+  });
+
   /* ---------------- 初始化 ---------------- */
+  applyStatic();
+  renderSample();
   showScreen('screen-upload');
 })();
 </script>

@@ -19,17 +19,16 @@ A purely front-end static website for "custom quiz banks"
 
 ```json
 {
-  "題目數": 1,
-  "題目": [
+  "questions": [
     {
-      "題號": 1,
-      "題目": "Given a = 1 and b = 2, what is a + b?",
+      "id": 1,
+      "question": "Given a = 1 and b = 2, what is a + b?",
       "A": "1",
       "B": "2",
       "C": "3",
       "D": "4",
-      "答案": "C",
-      "詳解": "Add a = 1 and b = 2: 1 + 2 = 3, so the answer is C."
+      "answer": "C",
+      "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
     }
   ]
 }
@@ -39,23 +38,22 @@ A purely front-end static website for "custom quiz banks"
 
 | Field | Required | Description |
 | --- | --- | --- |
-| `題目數` | Optional | For reference only; the actual total is based on the length of the `題目` array |
-| `題目` | **Required** | Array of question objects; must not be empty |
-| `題號` | Optional | If omitted, questions are numbered automatically as 1, 2, 3… |
-| `題目` | **Required** | The question text |
+| `questions` | **Required** | Array of question objects; must not be empty |
+| `id` | Optional | If omitted, questions are numbered automatically as 1, 2, 3… |
+| `question` | **Required** | The question text |
 | `A` / `B` / `C` / `D` | **Required** | The text content of the four options |
-| `答案` | **Required** | The correct option: `A`, `B`, `C`, or `D` (case-insensitive) |
-| `詳解` | Optional | Explanation text; shows "（無提供詳解）" when omitted |
+| `answer` | **Required** | The correct option: `A`, `B`, `C`, or `D` (case-insensitive) |
+| `explanation` | Optional | Explanation text; shows "(No explanation provided)" when omitted |
 
 ### Compatibility
 
-The following field aliases are also recognized, so existing quiz banks can be reused as-is:
+The following field aliases are also recognized, so existing quiz banks (including Chinese ones) can be reused as-is:
 
-- `題目` (question): `題目`, `题目`, `question`, `title`
+- `question`: `question`, `title`, `題目`, `题目`
 - Options: `A` / `a` / `選項A` (similarly for B, C, D)
-- `答案` (answer): `答案`, `answer`
-- `詳解` (explanation): `詳解`, `详解`, `解析`, `explanation`
-- `題號` (number): `題號`, `题号`, `id`, `no`
+- `answer`: `answer`, `答案`
+- `explanation`: `explanation`, `解析`, `詳解`, `详解`
+- `id` (question number): `id`, `no`, `題號`, `题号`
 
 If the file contains a BOM (`\uFEFF`) character, it is removed automatically before parsing. Line breaks in the explanation can be written as `\n` and are preserved when displayed.
 
@@ -80,9 +78,11 @@ File loading page
 
 ```
 .
-├── index.html      # Main program, contains all HTML / CSS / JavaScript
-├── example.json    # Sample quiz bank (3 questions, same as the site's "Download sample JSON")
-└── README.md
+├── index.html        # Main program, contains all HTML / CSS / JavaScript
+├── example.json      # Chinese sample quiz bank (3 questions, same as the site's "Download sample JSON" in Chinese mode)
+├── example_eng.json  # English sample quiz bank (3 questions, same as the site's "Download sample JSON" in English mode)
+├── README.md         # Chinese documentation
+└── README.en.md      # English documentation
 ```
 
 ---
@@ -90,7 +90,7 @@ File loading page
 ## Tips
 
 - Clicking an option again **deselects** it, returning that question to the unanswered state.
-- After shuffling, the question number shown on screen is "the position in this quiz" and is unrelated to the original `題號` in the JSON.
+- After shuffling, the question number shown on screen is "the position in this quiz" and is unrelated to the original `id` in the JSON.
 - "Restart quiz" does not reload the file, making it ideal for practicing the same quiz bank again.
 
 ---

@@ -1,0 +1,34 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "Given a = 1 and b = 2, what is a + b?",
+            "A": "1",
+            "B": "2",
+            "C": "3",
+            "D": "4",
+            "answer": "C",
+            "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
+        },
+        {
+            "id": 2,
+            "question": "Given c = 3 and d = 4, what is d - c?",
+            "A": "1",
+            "B": "2",
+            "C": "3",
+            "D": "4",
+            "answer": "A",
+            "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is A."
+        },
+        {
+            "id": 3,
+            "question": "Which of the following is a prime number?",
+            "A": "9",
+            "B": "15",
+            "C": "21",
+            "D": "17",
+            "answer": "D",
+            "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is D."
+        }
+    ]
+}
