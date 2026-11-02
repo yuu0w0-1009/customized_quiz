@@ -81,3 +81,7 @@ File loading page
 - "Restart quiz" does not reload the file, making it ideal for practicing the same quiz bank again.
 
 ---
+
+## Changelog
+
+- v1.0 Initial release of the custom quiz site with Chinese/English support
