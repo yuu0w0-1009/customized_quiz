@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>(゜ω゜)=👉自訂題庫測驗 v1.0</title>
+<style>
+  :root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --primary-soft:#eff6ff;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --ok:#15803d;
+    --ok-soft:#f0fdf4;
+    --no:#dc2626;
+    --no-soft:#fef2f2;
+    --shadow:0 1px 3px rgba(15,23,42,.08), 0 8px 24px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;font-size:inherit;cursor:pointer;}
+  [hidden]{display:none !important;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px;}
+  .screen{display:block;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:24px;
+  }
+
+  h1{font-size:24px;margin:0 0 6px;}
+  h2{font-size:18px;margin:0 0 12px;}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 24px;}
+
+  /* ---------- 按鈕 ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:1px solid var(--border);background:#fff;color:var(--text);
+    padding:10px 18px;border-radius:10px;font-weight:600;
+    transition:.15s ease;
+  }
+  .btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-primary:hover:not(:disabled){background:var(--primary-dark);border-color:var(--primary-dark);}
+  .btn-danger{background:var(--no);border-color:var(--no);color:#fff;}
+  .btn-danger:hover:not(:disabled){background:#b91c1c;border-color:#b91c1c;}
+  .btn-sm{padding:7px 12px;font-size:13px;border-radius:8px;}
+  .btn-block{width:100%;}
+
+  /* ---------- 上傳頁 ---------- */
+  .drop{
+    border:2px dashed #cbd5e1;border-radius:12px;background:#f8fafc;
+    padding:36px 20px;text-align:center;transition:.15s ease;
+  }
+  .drop:hover{border-color:var(--primary);background:var(--primary-soft);}
+  .drop.dragging{border-color:var(--primary);background:var(--primary-soft);box-shadow:inset 0 0 0 3px rgba(37,99,235,.12);}
+  .drop.dragging .drop-title{color:var(--primary);}
+  .drop-title{font-weight:700;margin-bottom:4px;}
+  .drop-hint{color:var(--muted);font-size:13px;margin-bottom:16px;}
+  input[type=file]{display:none;}
+
+  .msg{margin-top:16px;border-radius:10px;padding:12px 14px;font-size:14px;}
+  .msg-error{background:var(--no-soft);border:1px solid #fecaca;color:#991b1b;}
+  .msg-ok{background:var(--ok-soft);border:1px solid #bbf7d0;color:#166534;}
+
+  .upload-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:12px 0 10px;}
+  .check{display:inline-flex;align-items:center;gap:8px;margin-right:auto;font-size:14px;font-weight:600;cursor:pointer;user-select:none;}
+  .check input{width:17px;height:17px;margin:0;accent-color:var(--primary);cursor:pointer;}
+  .fmt{
+    margin-top:0;background:#f8fafc;border:1px solid var(--border);
+    border-radius:10px;padding:14px;font-size:12.5px;color:var(--muted);overflow:auto;
+  }
+  .fmt pre{margin:0;font-family:ui-monospace,Consolas,"Courier New",monospace;white-space:pre;}
+
+  /* ---------- 題目卡 ---------- */
+  .qmeta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  .qno{font-weight:700;color:var(--primary);font-size:15px;}
+  .qtotal{color:var(--muted);font-size:13px;}
+  .bar{height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:10px 0 22px;}
+  .bar > i{display:block;height:100%;background:var(--primary);width:0;transition:width .25s ease;}
+
+  .qtext{font-size:19px;font-weight:700;margin:0 0 20px;white-space:pre-wrap;}
+
+  .options{display:flex;flex-direction:column;gap:12px;}
+  .option{
+    display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
+    border:2px solid var(--border);background:#fff;border-radius:12px;
+    padding:14px 16px;transition:.15s ease;
+  }
+  .option:hover:not(:disabled){border-color:#93c5fd;background:var(--primary-soft);}
+  .option .badge{
+    flex:0 0 30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:#f1f5f9;font-weight:700;color:var(--muted);font-size:14px;
+  }
+  .option .otext{flex:1;white-space:pre-wrap;}
+  .option.selected{border-color:var(--primary);background:var(--primary-soft);}
+  .option.selected .badge{background:var(--primary);color:#fff;}
+  .option:disabled{cursor:default;}
+  .option.correct{border-color:#86efac;background:var(--ok-soft);}
+  .option.correct .badge{background:var(--ok);color:#fff;}
+  .option.wrong{border-color:#fecaca;background:var(--no-soft);}
+  .option.wrong .badge{background:var(--no);color:#fff;}
+  .option.locked{opacity:.75;}
+  .tag{
+    flex:0 0 auto;font-size:11.5px;font-weight:700;border-radius:99px;padding:2px 9px;
+    align-self:center;white-space:nowrap;
+  }
+  .tag-ok{background:#dcfce7;color:#166534;}
+  .tag-no{background:#fee2e2;color:#991b1b;}
+
+  .qnav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:18px;border-top:1px solid var(--border);}
+
+  .answer-box{margin-top:20px;border-radius:12px;padding:16px;font-size:14.5px;}
+  .answer-box.ok{background:var(--ok-soft);border:1px solid #bbf7d0;}
+  .answer-box.no{background:var(--no-soft);border:1px solid #fecaca;}
+  .answer-box .label{font-weight:700;margin-right:6px;}
+  .explain{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(15,23,42,.15);}
+  .explain .label{font-weight:700;display:block;margin-bottom:4px;}
+  .explain .body{white-space:pre-wrap;color:#334155;}
+
+  /* ---------- 結果頁 ---------- */
+  .result-grid{display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;}
+  .score-card{text-align:center;padding:28px 20px;}
+  .score-ring{
+    width:150px;height:150px;border-radius:50%;margin:0 auto 14px;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;
+    background:conic-gradient(var(--primary) 0deg, #e2e8f0 0deg);
+  }
+  .score-ring > span{
+    width:122px;height:122px;border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:800;color:var(--primary);
+  }
+  .score-sub{color:var(--muted);font-size:14px;}
+  .side{display:flex;flex-direction:column;gap:10px;position:sticky;top:24px;}
+
+  .banner-ok{
+    background:var(--ok-soft);border:1px solid #bbf7d0;color:#166534;
+    border-radius:12px;padding:16px;font-weight:700;text-align:center;margin-bottom:20px;
+  }
+  .wrong-item{border:1px solid var(--border);border-left:5px solid var(--no);border-radius:10px;padding:16px;margin-bottom:14px;background:#fff;}
+  .wrong-head{display:flex;gap:10px;align-items:baseline;font-weight:700;margin-bottom:8px;}
+  .wrong-head .no{color:var(--no);}
+  .wrong-body{font-size:14.5px;}
+  .wrong-body p{margin:4px 0;}
+  .kv{color:var(--muted);}
+  .kv b{color:var(--text);}
+  .kv .bad{color:var(--no);font-weight:700;}
+  .kv .good{color:var(--ok);font-weight:700;}
+  .wrong-explain{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);white-space:pre-wrap;color:#334155;}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal{
+    background:#fff;border-radius:16px;max-width:440px;width:100%;
+    padding:24px;box-shadow:0 20px 50px rgba(15,23,42,.3);
+  }
+  .modal h3{margin:0 0 10px;font-size:18px;}
+  .modal p{margin:0 0 6px;color:#334155;font-size:14.5px;}
+  .modal .nos{font-weight:700;color:var(--no);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap;}
+
+  @media (max-width:760px){
+    .result-grid{grid-template-columns:1fr;}
+    .side{position:static;flex-direction:row;flex-wrap:wrap;}
+    .side .btn{flex:1 1 140px;}
+    .wrap{padding:16px 12px 40px;}
+    .card{padding:18px;}
+    .qtext{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ========== 1. 檔案讀取頁 ========== -->
+  <section id="screen-upload" class="screen">
+    <div class="card">
+      <h1>自訂題庫測驗 v1.0</h1>
+      <p class="sub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
+
+      <div class="drop" id="dropZone">
+        <div class="drop-title">選擇題庫檔案</div>
+        <div class="drop-hint">將 .json 檔案拖拽到這裡，或點擊下方按鈕選擇</div>
+        <button class="btn btn-primary" id="btnPick">選擇 JSON 檔案</button>
+        <input type="file" id="fileInput" accept=".json,application/json">
+      </div>
+
+      <div id="uploadMsg"></div>
+
+      <div class="upload-actions">
+        <label class="check" id="shuffleWrap" hidden>
+          <input type="checkbox" id="shuffleCheck">
+          <span>打亂題目</span>
+        </label>
+        <button class="btn btn-sm" id="btnSample">下載範例 JSON</button>
+      </div>
+
+      <div class="fmt">
+        <div style="font-weight:700;margin-bottom:6px;color:#334155;">JSON 格式範例</div>
+        <pre id="fmtSample"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 2. 答題頁 ========== -->
+  <section id="screen-quiz" class="screen" hidden>
+    <div class="card">
+      <div class="qmeta">
+        <span class="qno" id="quizNo"></span>
+        <span class="qtotal" id="quizTotal"></span>
+      </div>
+      <div class="bar"><i id="quizBar"></i></div>
+      <p class="qtext" id="quizText"></p>
+      <div class="options" id="quizOptions"></div>
+      <div class="qnav">
+        <button class="btn" id="btnPrev">上一題</button>
+        <button class="btn btn-primary" id="btnNext">下一題</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. 結果結算頁 ========== -->
+  <section id="screen-result" class="screen" hidden>
+    <div class="result-grid">
+      <div>
+        <div id="allCorrect"></div>
+        <div class="card score-card">
+          <div class="score-ring" id="scoreRing"><span id="scoreRate">0%</span></div>
+          <div class="score-sub" id="scoreDetail"></div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <h2 id="wrongTitle">錯題（含未作答）</h2>
+          <div id="wrongList"></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card" style="padding:16px;">
+          <div style="font-weight:700;margin-bottom:12px;">功能</div>
+          <button class="btn btn-primary btn-block" id="btnReview" style="margin-bottom:10px;">觀看全部詳解</button>
+          <button class="btn btn-block" id="btnRetry" style="margin-bottom:10px;">重新開始答題</button>
+          <button class="btn btn-block" id="btnRestart">從頭開始</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 5. 觀看全部詳解頁 ========== -->
+  <section id="screen-review" class="screen" hidden>
+    <div class="card">
+      <div class="qmeta">
+        <span class="qno" id="revNo"></span>
+        <span class="qtotal" id="revTotal"></span>
+      </div>
+      <div class="bar"><i id="revBar"></i></div>
+      <p class="qtext" id="revText"></p>
+      <div class="options" id="revOptions"></div>
+      <div class="answer-box" id="revAnswerBox">
+        <div>
+          <span class="label">你的選擇：</span><span id="revMineText"></span>
+          　<span class="label">正確答案：</span><span id="revAnswerText"></span>
+        </div>
+        <div class="explain">
+          <span class="label">詳解</span>
+          <div class="body" id="revExplain"></div>
+        </div>
+      </div>
+      <div class="qnav">
+        <button class="btn" id="revPrev">上一題</button>
+        <button class="btn btn-primary" id="revNext">下一題</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ========== 3. 交卷檢查彈窗 ========== -->
+<div class="overlay" id="modalOverlay" hidden>
+  <div class="modal">
+    <h3>還有題目未作答</h3>
+    <p>以下題號尚未作答，未作答將以答錯計算：</p>
+    <p class="nos" id="modalNos"></p>
+    <div class="modal-actions">
+      <button class="btn" id="btnKeep">繼續答題</button>
+      <button class="btn btn-danger" id="btnForceSubmit">確認交卷</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var LABELS = ['A','B','C','D'];
+
+  /* ---------------- 狀態 ---------------- */
+  var state = {
+    questions: [],   // 正規化後的題目
+    answers: [],     // 使用者作答：'A'~'D' 或 null
+    qi: 0,           // 答題頁索引
+    ri: 0            // 詳解頁索引
+  };
+
+  /* ---------------- 工具 ---------------- */
+  function $(id){ return document.getElementById(id); }
+
+  // 忽略 Key 前面可能存在的 BOM / 空白，提升相容性
+  function normKey(k){ return String(k).replace(/^\uFEFF/, '').trim(); }
+
+  function pick(obj, names){
+    if(!obj || typeof obj !== 'object') return undefined;
+    var keys = Object.keys(obj);
+    for(var i=0;i<keys.length;i++){
+      if(names.indexOf(normKey(keys[i])) !== -1) return obj[keys[i]];
+    }
+    return undefined;
+  }
+
+  function toText(v){
+    if(v === undefined || v === null) return '';
+    return String(v).trim();
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function showScreen(name){
+    ['screen-upload','screen-quiz','screen-result','screen-review'].forEach(function(id){
+      $(id).hidden = (id !== name);
+    });
+    window.scrollTo(0,0);
+  }
+
+  /* ---------------- 範例 JSON ---------------- */
+  var SAMPLE = {
+    "題目數": 3,
+    "題目": [
+      {
+        "題號": 1,
+        "題目": "已知 a = 1、b = 2，則 a + b = ?",
+        "A": "1", "B": "2", "C": "3", "D": "4",
+        "答案": "C",
+        "詳解": "將 a = 1 與 b = 2 相加，1 + 2 = 3，故選 C。"
+      },
+      {
+        "題號": 2,
+        "題目": "已知 c = 3、d = 4，則 d - c = ?",
+        "A": "1", "B": "2", "C": "3", "D": "4",
+        "答案": "A",
+        "詳解": "將 d = 4 減去 c = 3，4 - 3 = 1，故選 A。"
+      },
+      {
+        "題號": 3,
+        "題目": "下列何者是質數？",
+        "A": "9", "B": "15", "C": "21", "D": "17",
+        "答案": "D",
+        "詳解": "9、15、21 皆可被 3 整除，只有 17 除了 1 與自身外沒有其他因數，故選 D。"
+      }
+    ]
+  };
+
+  $('fmtSample').textContent = JSON.stringify(SAMPLE, null, 4);
+
+  $('btnSample').addEventListener('click', function(){
+    var blob = new Blob([JSON.stringify(SAMPLE, null, 4)], {type:'application/json;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'example.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  /* ---------------- 檔案讀取 ---------------- */
+  $('btnPick').addEventListener('click', function(){ $('fileInput').click(); });
+
+  $('fileInput').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if(file) handleFile(file);
+  });
+
+  // 拖拽上傳
+  var dropZone = $('dropZone');
+  var dragDepth = 0;   // 避免子元素 dragleave 造成高亮閃爍
+
+  // 防止拖到區域外時瀏覽器直接開啟檔案、導致頁面被置換
+  ['dragover','drop'].forEach(function(type){
+    document.addEventListener(type, function(e){ e.preventDefault(); });
+  });
+
+  ['dragenter','dragover','dragleave','drop'].forEach(function(type){
+    dropZone.addEventListener(type, function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  dropZone.addEventListener('dragenter', function(){
+    dragDepth++;
+    dropZone.classList.add('dragging');
+  });
+
+  dropZone.addEventListener('dragleave', function(){
+    dragDepth = Math.max(0, dragDepth - 1);
+    if(dragDepth === 0) dropZone.classList.remove('dragging');
+  });
+
+  dropZone.addEventListener('drop', function(e){
+    dragDepth = 0;
+    dropZone.classList.remove('dragging');
+    var dt = e.dataTransfer;
+    var files = dt && dt.files;
+    if(!files || files.length === 0) return;
+    handleFile(files[0]);
+  });
+
+  function handleFile(file){
+    if(!/\.json$/i.test(file.name)){
+      failUpload('僅支援 .json 檔案，請重新選擇。');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var questions = parseBank(ev.target.result);
+        successUpload(questions, file.name);
+      }catch(err){
+        failUpload(err && err.message ? err.message : '讀取失敗，請確認檔案內容是否正確。');
+      }
+    };
+    reader.onerror = function(){
+      failUpload('檔案讀取失敗，請重新選擇檔案。');
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function resetUploadState(){
+    $('fileInput').value = '';
+    $('uploadMsg').innerHTML = '';
+    $('shuffleCheck').checked = false;
+    $('shuffleWrap').hidden = true;
+    state.questions = [];
+    state.answers = [];
+    state.qi = 0;
+    state.ri = 0;
+  }
+
+  function failUpload(msg){
+    resetUploadState();
+    $('uploadMsg').innerHTML = '<div class="msg msg-error">' + esc(msg) + '</div>';
+  }
+
+  function successUpload(questions, fileName){
+    resetUploadState();
+    state.questions = questions;
+    state.answers = new Array(questions.length).fill(null);
+    $('shuffleWrap').hidden = false;
+    $('uploadMsg').innerHTML =
+      '<div class="msg msg-ok">讀取成功：' + esc(fileName) + '，共 ' + questions.length +
+      ' 題（題庫總題數以「題目」陣列長度 ' + questions.length + ' 為準）。' +
+      '<div style="margin-top:12px;text-align:right;">' +
+      '<button class="btn btn-primary" id="btnStart">開始測驗</button></div></div>';
+    $('btnStart').addEventListener('click', startQuiz);
+  }
+
+  // 開始（或重新開始）一次測驗
+  function startQuiz(){
+    if($('shuffleCheck').checked) shuffle(state.questions);
+    state.answers = new Array(state.questions.length).fill(null);
+    state.qi = 0;
+    renderQuiz();
+  }
+
+  // Fisher-Yates 洗牌
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function parseBank(text){
+    // 移除所有 BOM（有些編輯器會把 BOM 寫進 Key 前面，導致解析失敗）
+    var clean = String(text).replace(/\uFEFF/g, '');
+    var data;
+    try{
+      data = JSON.parse(clean);
+    }catch(e){
+      throw new Error('JSON 格式解析失敗，請確認檔案內容為有效的 JSON。');
+    }
+    if(!data || typeof data !== 'object' || Array.isArray(data)){
+      throw new Error('格式錯誤：JSON 最外層必須是物件。');
+    }
+    var list = pick(data, ['題目','题目','questions']);
+    if(!Array.isArray(list)){
+      throw new Error('格式錯誤：找不到「題目」陣列。');
+    }
+    if(list.length === 0){
+      throw new Error('格式錯誤：「題目」陣列為空，請至少放入一題。');
+    }
+    return list.map(function(raw, i){
+      var no = pick(raw, ['題號','题号','id','no']);
+      if(no === undefined || no === null || toText(no) === '') no = i + 1;
+      var opts = {};
+      LABELS.forEach(function(l){
+        opts[l] = toText(pick(raw, [l, l.toLowerCase(), '選項' + l]));
+      });
+      return {
+        no: toText(no),
+        title: toText(pick(raw, ['題目','题目','question','title'])) || '(此題無題目內容)',
+        options: opts,
+        answer: toText(pick(raw, ['答案','answer'])).toUpperCase(),
+        explain: toText(pick(raw, ['詳解','详解','解析','explanation']))
+      };
+    });
+  }
+
+  /* ---------------- 共用：渲染題目卡 ---------------- */
+  function fillMeta(noEl, totalEl, barEl, index, total){
+    // 題號一律依「測驗呈現順序」編號，避免打亂題目後題號跳號
+    noEl.textContent = '第 ' + (index + 1) + ' 題';
+    totalEl.textContent = '共 ' + total + ' 題（進度 ' + (index + 1) + '/' + total + '）';
+    barEl.style.width = ((index + 1) / total * 100) + '%';
+  }
+
+  /* ---------------- 2. 答題頁 ---------------- */
+  function renderQuiz(){
+    showScreen('screen-quiz');
+    var q = state.questions[state.qi];
+    var total = state.questions.length;
+
+    fillMeta($('quizNo'), $('quizTotal'), $('quizBar'), state.qi, total);
+    $('quizText').textContent = q.title;
+
+    var box = $('quizOptions');
+    box.innerHTML = '';
+    LABELS.forEach(function(l){
+      var btn = document.createElement('button');
+      btn.className = 'option' + (state.answers[state.qi] === l ? ' selected' : '');
+      btn.innerHTML = '<span class="badge">' + l + '</span>' +
+                      '<span class="otext">' + esc(q.options[l] || '') + '</span>';
+      btn.addEventListener('click', function(){
+        // 點擊可選取或切換答案
+        state.answers[state.qi] = (state.answers[state.qi] === l) ? null : l;
+        renderQuiz();
+      });
+      box.appendChild(btn);
+    });
+
+    $('btnPrev').disabled = (state.qi === 0);
+    var next = $('btnNext');
+    if(state.qi === total - 1){
+      next.textContent = '交卷';
+      next.className = 'btn btn-danger';
+    }else{
+      next.textContent = '下一題';
+      next.className = 'btn btn-primary';
+    }
+  }
+
+  $('btnPrev').addEventListener('click', function(){
+    if(state.qi > 0){ state.qi--; renderQuiz(); }
+  });
+
+  $('btnNext').addEventListener('click', function(){
+    if(state.qi < state.questions.length - 1){
+      state.qi++;
+      renderQuiz();
+    }else{
+      onSubmit();
+    }
+  });
+
+  /* ---------------- 3. 交卷檢查彈窗 ---------------- */
+  function unansweredList(){
+    var out = [];
+    state.answers.forEach(function(a, i){
+      if(!a) out.push(i);
+    });
+    return out;
+  }
+
+  function onSubmit(){
+    var missing = unansweredList();
+    if(missing.length === 0){
+      renderResult();
+      return;
+    }
+    // missing 為索引升序，轉成「第 N 題」後即依測驗順序排列
+    var nos = missing.map(function(i){ return i + 1; });
+    $('modalNos').textContent = '第 ' + nos.join('、') + ' 題尚未作答';
+    $('modalOverlay').hidden = false;
+  }
+
+  $('btnKeep').addEventListener('click', function(){
+    $('modalOverlay').hidden = true;
+  });
+
+  $('btnForceSubmit').addEventListener('click', function(){
+    $('modalOverlay').hidden = true;
+    renderResult();
+  });
+
+  /* ---------------- 4. 結果結算頁 ---------------- */
+  function score(){
+    var correct = 0;
+    state.questions.forEach(function(q, i){
+      if(state.answers[i] && state.answers[i] === q.answer) correct++;
+    });
+    return correct;
+  }
+
+  function renderResult(){
+    showScreen('screen-result');
+    var total = state.questions.length;
+    var correct = score();
+    var raw = total ? (correct / total * 100) : 0;
+    var rateText = (Math.round(raw * 10) / 10).toString().replace(/\.0$/, '') + '%';
+
+    $('scoreRate').textContent = rateText;
+    $('scoreDetail').textContent = '答對 ' + correct + ' 題 / 共 ' + total + ' 題';
+    $('scoreRing').style.background =
+      'conic-gradient(var(--primary) ' + (raw * 3.6) + 'deg, #e2e8f0 ' + (raw * 3.6) + 'deg)';
+
+    $('allCorrect').innerHTML = (correct === total)
+      ? '<div class="banner-ok">恭喜全對！</div>'
+      : '';
+
+    var wrong = [];
+    state.questions.forEach(function(q, i){
+      if(!state.answers[i] || state.answers[i] !== q.answer) wrong.push(i);
+    });
+
+    $('wrongTitle').textContent = '錯題（含未作答）　共 ' + wrong.length + ' 題';
+
+    var list = $('wrongList');
+    if(wrong.length === 0){
+      list.innerHTML = '<p style="color:var(--muted);margin:0;">本次測驗沒有錯題。</p>';
+    }else{
+      list.innerHTML = wrong.map(function(i){
+        var q = state.questions[i];
+        var mine = state.answers[i];
+        return '' +
+        '<div class="wrong-item">' +
+          '<div class="wrong-head"><span class="no">第 ' + (i + 1) + ' 題</span>' +
+            '<span>' + esc(q.title) + '</span></div>' +
+          '<div class="wrong-body">' +
+            '<p class="kv">你的選擇：<b class="' + (mine ? 'bad' : '') + '">' +
+              (mine ? esc(mine) + '. ' + esc(q.options[mine] || '') : '未作答') + '</b></p>' +
+            '<p class="kv">正確答案：<b class="good">' + esc(q.answer) + '. ' +
+              esc(q.options[q.answer] || '') + '</b></p>' +
+            '<div class="wrong-explain"><b>詳解：</b>' + esc(q.explain || '（無提供詳解）') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  $('btnReview').addEventListener('click', function(){
+    state.ri = 0;
+    renderReview();
+  });
+
+  $('btnRetry').addEventListener('click', function(){
+    // 保留題庫，清除作答紀錄（若勾選「打亂題目」則重新洗牌）
+    startQuiz();
+  });
+
+  $('btnRestart').addEventListener('click', function(){
+    // 清除所有資料，回到初始頁
+    resetUploadState();
+    showScreen('screen-upload');
+  });
+
+  /* ---------------- 5. 觀看全部詳解頁 ---------------- */
+  function renderReview(){
+    showScreen('screen-review');
+    var q = state.questions[state.ri];
+    var total = state.questions.length;
+    var mine = state.answers[state.ri];
+    var isRight = (!!mine && mine === q.answer);
+
+    fillMeta($('revNo'), $('revTotal'), $('revBar'), state.ri, total);
+    $('revText').textContent = q.title;
+
+    var box = $('revOptions');
+    box.innerHTML = '';
+    LABELS.forEach(function(l){
+      var cls = 'option locked';
+      var tag = '';
+      if(l === q.answer){
+        cls = 'option correct';
+        tag = '<span class="tag tag-ok">正確答案</span>';
+      }else if(mine === l){
+        cls = 'option wrong';
+        tag = '<span class="tag tag-no">你的選擇</span>';
+      }
+      var btn = document.createElement('button');
+      btn.className = cls;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="badge">' + l + '</span>' +
+                      '<span class="otext">' + esc(q.options[l] || '') + '</span>' + tag;
+      box.appendChild(btn);
+    });
+
+    var boxEl = $('revAnswerBox');
+    boxEl.className = 'answer-box ' + (isRight ? 'ok' : 'no');
+    $('revMineText').textContent = mine ? mine : '未作答';
+    $('revAnswerText').textContent = q.answer || '（未提供）';
+    $('revExplain').textContent = q.explain || '（無提供詳解）';
+
+    $('revPrev').disabled = (state.ri === 0);
+    var next = $('revNext');
+    if(state.ri === total - 1){
+      next.textContent = '結束';
+      next.className = 'btn btn-primary';
+    }else{
+      next.textContent = '下一題';
+      next.className = 'btn btn-primary';
+    }
+  }
+
+  $('revPrev').addEventListener('click', function(){
+    if(state.ri > 0){ state.ri--; renderReview(); }
+  });
+
+  $('revNext').addEventListener('click', function(){
+    if(state.ri < state.questions.length - 1){
+      state.ri++;
+      renderReview();
+    }else{
+      // 保留成績與紀錄，回到結果結算頁
+      renderResult();
+    }
+  });
+
+  /* ---------------- 初始化 ---------------- */
+  showScreen('screen-upload');
+})();
+</script>
+</body>
+</html>
