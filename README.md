@@ -1,4 +1,4 @@
-# [自訂題庫測驗v1.1](https://yuu0w0-1009.github.io/customized_quiz/)
+# [自訂題庫測驗v1.2](https://yuu0w0-1009.github.io/customized_quiz/)
 **中文** ｜ [English](README.en.md)
 
 一個純前端的「自訂題庫測驗」靜態網站
@@ -86,5 +86,6 @@
 
 ## 更新說明
 
+- v1.2 新增亮色／暗色模式切換（會記住選擇），優化 UI
 - v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結
 - v1.0 初始化自訂題庫測驗網站並新增中英對照

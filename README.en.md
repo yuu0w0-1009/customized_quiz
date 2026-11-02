@@ -1,4 +1,4 @@
-# [Custom Quiz Bank v1.1](https://yuu0w0-1009.github.io/customized_quiz/)
+# [Custom Quiz Bank v1.2](https://yuu0w0-1009.github.io/customized_quiz/)
 [中文](README.md) ｜ **English**
 
 A purely front-end static website for "custom quiz banks"
@@ -84,5 +84,6 @@ File loading page
 
 ## Changelog
 
+- v1.2 Added a light/dark mode toggle (your choice is remembered) and optimized UI
 - v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link
 - v1.0 Initial release of the custom quiz site with Chinese/English support

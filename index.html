@@ -3,23 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>(゜ω゜)=👉自訂題庫測驗 v1.1</title>
+<title>(゜ω゜)=👉自訂題庫測驗 v1.2</title>
 <style>
   :root{
+    --title-size:24px;               /* 標題字級，同時用來對齊語言／主題選擇欄的高度 */
+
     --primary:#2563eb;
     --primary-dark:#1d4ed8;
     --primary-soft:#eff6ff;
     --bg:#f1f5f9;
     --card:#ffffff;
+    --surface:#ffffff;               /* 卡片內的元件：按鈕、選項、彈窗… */
+    --panel:#f8fafc;                 /* 淺底區塊：拖放區、範例、更新說明 */
+    --chip:#f1f5f9;                  /* 選項圓形標籤底色 */
+    --track:#e2e8f0;                 /* 進度條、分數圓環底色 */
+    --line-soft:#cbd5e1;
+    --line-hover:#93c5fd;
     --text:#0f172a;
+    --text-2:#334155;                /* 次級文字 */
     --muted:#64748b;
     --border:#e2e8f0;
     --ok:#15803d;
     --ok-soft:#f0fdf4;
+    --ok-line:#bbf7d0;
+    --ok-edge:#86efac;
+    --ok-chip:#dcfce7;
+    --ok-text:#166534;
     --no:#dc2626;
     --no-soft:#fef2f2;
+    --no-line:#fecaca;
+    --no-chip:#fee2e2;
+    --no-text:#991b1b;
+    --dash:rgba(15,23,42,.15);
+    --overlay:rgba(15,23,42,.55);
     --shadow:0 1px 3px rgba(15,23,42,.08), 0 8px 24px rgba(15,23,42,.06);
   }
+
+  /* ---------- 暗色模式 ---------- */
+  [data-theme="dark"]{
+    --primary:#60a5fa;
+    --primary-dark:#3b82f6;
+    --primary-soft:#26313d;
+    --bg:#121212;
+    --card:#1c1c1c;
+    --surface:#262626;
+    --panel:#171717;
+    --chip:#333333;
+    --track:#3d3d3d;
+    --line-soft:#4d4d4d;
+    --line-hover:#3b82f6;
+    --text:#e8e8e8;
+    --text-2:#cfcfcf;
+    --muted:#9e9e9e;
+    --border:#333333;
+    --ok:#4ade80;
+    --ok-soft:#132a1e;
+    --ok-line:#14532d;
+    --ok-edge:#166534;
+    --ok-chip:#14532d;
+    --ok-text:#86efac;
+    --no:#f87171;
+    --no-soft:#2c1618;
+    --no-line:#7f1d1d;
+    --no-chip:#7f1d1d;
+    --no-text:#fca5a5;
+    --dash:rgba(226,232,240,.18);
+    --overlay:rgba(2,6,23,.7);
+    --shadow:0 1px 3px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.45);
+  }
+  /* 暗色模式下，實心強調色的底改配深色文字以維持對比 */
+  [data-theme="dark"] .btn-primary,
+  [data-theme="dark"] .btn-danger{color:#121212;}
+  [data-theme="dark"] .btn-danger:hover:not(:disabled){background:#ef4444;border-color:#ef4444;}
+  [data-theme="dark"] .option.selected .badge,
+  [data-theme="dark"] .option.correct .badge,
+  [data-theme="dark"] .option.wrong .badge{color:#121212;}
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -45,18 +103,24 @@
     position:relative;
   }
 
-  /* ---------- 語言切換 ---------- */
-  .lang-switch{position:absolute;top:14px;right:14px;z-index:1;}
-  .lang-switch select{
+  /* ---------- 標題區與語言／主題切換 ---------- */
+  .upload-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+  .head-text{flex:1 1 auto;min-width:0;}
+  .head-text .sub-note{margin-bottom:0;}
+  .lang-switch{display:flex;flex-direction:column;align-items:stretch;gap:8px;flex:0 0 auto;}
+  .lang-switch select,.theme-btn{
     font-family:inherit;font-size:13px;font-weight:600;color:var(--text);
-    background:#fff;border:1px solid var(--border);border-radius:8px;
-    padding:6px 10px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    height:calc(var(--title-size) * 1.7);padding:0 10px;cursor:pointer;
   }
-  .lang-switch select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15);}
-  #screen-upload h1{padding-right:118px;}
+  .lang-switch select:focus,.theme-btn:focus-visible{
+    outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15);
+  }
+  .theme-btn{transition:.15s ease;}
+  .theme-btn:hover{border-color:var(--line-soft);}
   .lbl{margin-right:6px;}
 
-  h1{font-size:24px;margin:0 0 6px;}
+  h1{font-size:var(--title-size);line-height:1.7;margin:0 0 6px;}
   h2{font-size:18px;margin:0 0 12px;}
   .sub{color:var(--muted);font-size:14px;margin:0 0 6px;}
   .sub-note{color:var(--muted);font-size:12.5px;margin:0 0 24px;}
@@ -64,11 +128,11 @@
   /* ---------- 按鈕 ---------- */
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    border:1px solid var(--border);background:#fff;color:var(--text);
+    border:1px solid var(--border);background:var(--surface);color:var(--text);
     padding:10px 18px;border-radius:10px;font-weight:600;
     transition:.15s ease;
   }
-  .btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc;}
+  .btn:hover:not(:disabled){border-color:var(--line-soft);background:var(--panel);}
   .btn:disabled{opacity:.45;cursor:not-allowed;}
   .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
   .btn-primary:hover:not(:disabled){background:var(--primary-dark);border-color:var(--primary-dark);}
@@ -79,7 +143,7 @@
 
   /* ---------- 上傳頁 ---------- */
   .drop{
-    border:2px dashed #cbd5e1;border-radius:12px;background:#f8fafc;
+    border:2px dashed var(--line-soft);border-radius:12px;background:var(--panel);
     padding:36px 20px;text-align:center;transition:.15s ease;
   }
   .drop:hover{border-color:var(--primary);background:var(--primary-soft);}
@@ -90,8 +154,8 @@
   input[type=file]{display:none;}
 
   .msg{margin-top:16px;border-radius:10px;padding:12px 14px;font-size:14px;}
-  .msg-error{background:var(--no-soft);border:1px solid #fecaca;color:#991b1b;}
-  .msg-ok{background:var(--ok-soft);border:1px solid #bbf7d0;color:#166534;}
+  .msg-error{background:var(--no-soft);border:1px solid var(--no-line);color:var(--no-text);}
+  .msg-ok{background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok-text);}
 
   .upload-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:12px 0 10px;}
   .check{display:inline-flex;align-items:center;gap:8px;margin-right:auto;font-size:14px;font-weight:600;cursor:pointer;user-select:none;}
@@ -99,14 +163,14 @@
   .check-group .check{margin-right:0;}
   .check input{width:17px;height:17px;margin:0;accent-color:var(--primary);cursor:pointer;}
   .fmt{
-    margin-top:0;background:#f8fafc;border:1px solid var(--border);
+    margin-top:0;background:var(--panel);border:1px solid var(--border);
     border-radius:10px;padding:14px;font-size:12.5px;color:var(--muted);overflow:auto;
   }
   .fmt pre{margin:0;font-family:ui-monospace,Consolas,"Courier New",monospace;white-space:pre;}
 
   /* ---------- 更新說明 ---------- */
   .log{
-    margin-top:14px;background:#f8fafc;border:1px solid var(--border);
+    margin-top:14px;background:var(--panel);border:1px solid var(--border);
     border-radius:10px;padding:14px;font-size:12.5px;color:var(--muted);
   }
   .log ul{margin:0;padding-left:20px;}
@@ -121,7 +185,7 @@
   .qmeta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
   .qno{font-weight:700;color:var(--primary);font-size:15px;}
   .qtotal{color:var(--muted);font-size:13px;}
-  .bar{height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:10px 0 22px;}
+  .bar{height:6px;background:var(--track);border-radius:99px;overflow:hidden;margin:10px 0 22px;}
   .bar > i{display:block;height:100%;background:var(--primary);width:0;transition:width .25s ease;}
 
   .qtext{font-size:19px;font-weight:700;margin:0 0 20px;white-space:pre-wrap;}
@@ -129,39 +193,39 @@
   .options{display:flex;flex-direction:column;gap:12px;}
   .option{
     display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
-    border:2px solid var(--border);background:#fff;border-radius:12px;
+    border:2px solid var(--border);background:var(--surface);color:var(--text);border-radius:12px;
     padding:14px 16px;transition:.15s ease;
   }
-  .option:hover:not(:disabled){border-color:#93c5fd;background:var(--primary-soft);}
+  .option:hover:not(:disabled){border-color:var(--line-hover);background:var(--primary-soft);}
   .option .badge{
     flex:0 0 30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    background:#f1f5f9;font-weight:700;color:var(--muted);font-size:14px;
+    background:var(--chip);font-weight:700;color:var(--muted);font-size:14px;
   }
   .option .otext{flex:1;white-space:pre-wrap;}
   .option.selected{border-color:var(--primary);background:var(--primary-soft);}
   .option.selected .badge{background:var(--primary);color:#fff;}
   .option:disabled{cursor:default;}
-  .option.correct{border-color:#86efac;background:var(--ok-soft);}
+  .option.correct{border-color:var(--ok-edge);background:var(--ok-soft);}
   .option.correct .badge{background:var(--ok);color:#fff;}
-  .option.wrong{border-color:#fecaca;background:var(--no-soft);}
+  .option.wrong{border-color:var(--no-line);background:var(--no-soft);}
   .option.wrong .badge{background:var(--no);color:#fff;}
   .option.locked{opacity:.75;}
   .tag{
     flex:0 0 auto;font-size:11.5px;font-weight:700;border-radius:99px;padding:2px 9px;
     align-self:center;white-space:nowrap;
   }
-  .tag-ok{background:#dcfce7;color:#166534;}
-  .tag-no{background:#fee2e2;color:#991b1b;}
+  .tag-ok{background:var(--ok-chip);color:var(--ok-text);}
+  .tag-no{background:var(--no-chip);color:var(--no-text);}
 
   .qnav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:18px;border-top:1px solid var(--border);}
 
   .answer-box{margin-top:20px;border-radius:12px;padding:16px;font-size:14.5px;}
-  .answer-box.ok{background:var(--ok-soft);border:1px solid #bbf7d0;}
-  .answer-box.no{background:var(--no-soft);border:1px solid #fecaca;}
+  .answer-box.ok{background:var(--ok-soft);border:1px solid var(--ok-line);}
+  .answer-box.no{background:var(--no-soft);border:1px solid var(--no-line);}
   .answer-box .label{font-weight:700;margin-right:6px;}
-  .explain{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(15,23,42,.15);}
+  .explain{margin-top:12px;padding-top:12px;border-top:1px dashed var(--dash);}
   .explain .label{font-weight:700;display:block;margin-bottom:4px;}
-  .explain .body{white-space:pre-wrap;color:#334155;}
+  .explain .body{white-space:pre-wrap;color:var(--text-2);}
 
   /* ---------- 結果頁 ---------- */
   .result-grid{display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;}
@@ -169,10 +233,10 @@
   .score-ring{
     width:150px;height:150px;border-radius:50%;margin:0 auto 14px;display:flex;
     flex-direction:column;align-items:center;justify-content:center;
-    background:conic-gradient(var(--primary) 0deg, #e2e8f0 0deg);
+    background:conic-gradient(var(--primary) 0deg, var(--track) 0deg);
   }
   .score-ring > span{
-    width:122px;height:122px;border-radius:50%;background:#fff;
+    width:122px;height:122px;border-radius:50%;background:var(--card);
     display:flex;align-items:center;justify-content:center;
     font-size:30px;font-weight:800;color:var(--primary);
   }
@@ -180,10 +244,10 @@
   .side{display:flex;flex-direction:column;gap:10px;position:sticky;top:24px;}
 
   .banner-ok{
-    background:var(--ok-soft);border:1px solid #bbf7d0;color:#166534;
+    background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok-text);
     border-radius:12px;padding:16px;font-weight:700;text-align:center;margin-bottom:20px;
   }
-  .wrong-item{border:1px solid var(--border);border-left:5px solid var(--no);border-radius:10px;padding:16px;margin-bottom:14px;background:#fff;}
+  .wrong-item{border:1px solid var(--border);border-left:5px solid var(--no);border-radius:10px;padding:16px;margin-bottom:14px;background:var(--surface);}
   .wrong-head{display:flex;gap:10px;align-items:baseline;font-weight:700;margin-bottom:8px;}
   .wrong-head .no{color:var(--no);}
   .wrong-body{font-size:14.5px;}
@@ -192,19 +256,19 @@
   .kv b{color:var(--text);}
   .kv .bad{color:var(--no);font-weight:700;}
   .kv .good{color:var(--ok);font-weight:700;}
-  .wrong-explain{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);white-space:pre-wrap;color:#334155;}
+  .wrong-explain{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);white-space:pre-wrap;color:var(--text-2);}
 
   /* ---------- Modal ---------- */
   .overlay{
-    position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99;
+    position:fixed;inset:0;background:var(--overlay);z-index:99;
     display:flex;align-items:center;justify-content:center;padding:20px;
   }
   .modal{
-    background:#fff;border-radius:16px;max-width:440px;width:100%;
-    padding:24px;box-shadow:0 20px 50px rgba(15,23,42,.3);
+    background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;
+    padding:24px;box-shadow:var(--shadow);
   }
   .modal h3{margin:0 0 10px;font-size:18px;}
-  .modal p{margin:0 0 6px;color:#334155;font-size:14.5px;}
+  .modal p{margin:0 0 6px;color:var(--text-2);font-size:14.5px;}
   .modal .nos{font-weight:700;color:var(--no);}
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap;}
 
@@ -224,15 +288,20 @@
   <!-- ========== 1. 檔案讀取頁 ========== -->
   <section id="screen-upload" class="screen">
     <div class="card">
-      <div class="lang-switch">
-        <select id="langSelect" aria-label="Language">
-          <option value="zh">中文</option>
-          <option value="en">English</option>
-        </select>
+      <div class="upload-head">
+        <div class="head-text">
+          <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.2</h1>
+          <p class="sub" data-i18n="uploadSub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
+          <p class="sub-note" data-i18n="uploadNote">※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。</p>
+        </div>
+        <div class="lang-switch">
+          <select id="langSelect" aria-label="Language">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+          <button type="button" class="theme-btn" id="themeToggle" aria-label="Theme"></button>
+        </div>
       </div>
-      <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.1</h1>
-      <p class="sub" data-i18n="uploadSub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
-      <p class="sub-note" data-i18n="uploadNote">※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。</p>
 
       <div class="drop" id="dropZone">
         <div class="drop-title" data-i18n="dropTitle">選擇題庫檔案</div>
@@ -258,13 +327,14 @@
       </div>
 
       <div class="fmt">
-        <div style="font-weight:700;margin-bottom:6px;color:#334155;" data-i18n="fmtTitle">JSON 格式範例</div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text-2);" data-i18n="fmtTitle">JSON 格式範例</div>
         <pre id="fmtSample"></pre>
       </div>
 
       <div class="log">
-        <div style="font-weight:700;margin-bottom:6px;color:#334155;" data-i18n="logTitle">更新說明</div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text-2);" data-i18n="logTitle">更新說明</div>
         <ul>
+          <li data-i18n="logV3">v1.2 新增亮色／暗色模式切換（會記住選擇），優化UI</li>
           <li data-i18n="logV2">v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結</li>
           <li data-i18n="logV1">v1.0 初始化自訂題庫測驗網站並新增中英對照</li>
         </ul>
@@ -307,7 +377,7 @@
 
       <div class="side">
         <div class="card" style="padding:16px;">
-          <div style="font-weight:700;margin-bottom:12px;" data-i18n="sideTitle">功能</div>
+          <div style="font-weight:700;margin-bottom:12px;color:var(--text-2);" data-i18n="sideTitle">功能</div>
           <button class="btn btn-primary btn-block" id="btnReview" style="margin-bottom:10px;" data-i18n="btnReview">觀看全部詳解</button>
           <button class="btn btn-block" id="btnRetry" style="margin-bottom:10px;" data-i18n="btnRetry">重新開始答題</button>
           <button class="btn btn-block" id="btnRestart" data-i18n="btnRestart">從頭開始</button>
@@ -338,6 +408,7 @@
       </div>
       <div class="qnav">
         <button class="btn" id="revPrev" data-i18n="btnPrev">上一題</button>
+        <button class="btn" id="revEnd" data-i18n="btnEnd">結束</button>
         <button class="btn btn-primary" id="revNext">下一題</button>
       </div>
     </div>
@@ -372,7 +443,7 @@
   /* ---------------- 多語系 ---------------- */
   var I18N = {
     zh: {
-      uploadTitle:'自訂題庫測驗 v1.1',
+      uploadTitle:'自訂題庫測驗 v1.2',
       uploadSub:'上傳符合格式的 JSON 題庫檔案，即可開始測驗。',
       uploadNote:'※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。',
       dropTitle:'選擇題庫檔案',
@@ -383,6 +454,7 @@
       btnSample:'下載範例 JSON',
       fmtTitle:'JSON 格式範例',
       logTitle:'更新說明',
+      logV3:'v1.2 新增亮色／暗色模式切換（會記住選擇），優化UI',
       logV2:'v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結',
       logV1:'v1.0 初始化自訂題庫測驗網站並新增中英對照',
       quizNo:'第 {n} 題',
@@ -424,10 +496,12 @@
       errEmptyList:'格式錯誤：「題目」陣列為空，請至少放入一題。',
       okMsg:'讀取成功：{file}，共 {n} 題（題庫總題數以「題目」陣列長度 {n} 為準）。',
       btnStart:'開始測驗',
+      themeToDark:'暗色模式',
+      themeToLight:'亮色模式',
       listSep:'、'
     },
     en: {
-      uploadTitle:'Custom Quiz v1.1',
+      uploadTitle:'Custom Quiz v1.2',
       uploadSub:'Upload a question bank JSON file in the required format to start the quiz.',
       uploadNote:'※ Explanations are not changed when options are shuffled; the option letters in them may differ from what you see.',
       dropTitle:'Choose a question bank file',
@@ -438,6 +512,7 @@
       btnSample:'Download Sample JSON',
       fmtTitle:'JSON Format Example',
       logTitle:'Changelog',
+      logV3:'v1.2 Added a light/dark mode toggle (your choice is remembered) and optimize UI',
       logV2:'v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link',
       logV1:'v1.0 Initial release of the custom quiz site with Chinese/English support',
       quizNo:'Question {n}',
@@ -479,6 +554,8 @@
       errEmptyList:'Format error: the question list is empty. Please add at least one question.',
       okMsg:'Loaded: {file} — {n} question(s) in total.',
       btnStart:'Start Quiz',
+      themeToDark:'Dark mode',
+      themeToLight:'Light mode',
       listSep:', '
     }
   };
@@ -486,6 +563,29 @@
   var lang = 'zh';
   var activeScreen = 'screen-upload';
   var lastUpload = null;   // {kind:'ok', fileName, count} | {kind:'error', key}
+
+  /* ---------------- 亮色／暗色模式 ---------------- */
+  var THEME_KEY = 'quiz-theme';
+  var theme = 'light';
+
+  function readStoredTheme(){
+    try{
+      var v = window.localStorage.getItem(THEME_KEY);
+      return (v === 'dark' || v === 'light') ? v : 'light';
+    }catch(e){ return 'light'; }
+  }
+
+  function applyTheme(t){
+    theme = (t === 'dark') ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeButton();
+  }
+
+  function updateThemeButton(){
+    var btn = document.getElementById('themeToggle');
+    if(!btn) return;
+    btn.textContent = T(theme === 'dark' ? 'themeToLight' : 'themeToDark');
+  }
 
   function T(key, params){
     var dict = I18N[lang] || I18N.zh;
@@ -508,6 +608,7 @@
     }
     document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : 'en';
     document.title = T('uploadTitle');
+    updateThemeButton();
   }
 
   // 重新渲染目前畫面的動態文字
@@ -921,7 +1022,7 @@
     $('scoreRate').textContent = rateText;
     $('scoreDetail').textContent = T('scoreDetail', {c: correct, t: total});
     $('scoreRing').style.background =
-      'conic-gradient(var(--primary) ' + (raw * 3.6) + 'deg, #e2e8f0 ' + (raw * 3.6) + 'deg)';
+      'conic-gradient(var(--primary) ' + (raw * 3.6) + 'deg, var(--track) ' + (raw * 3.6) + 'deg)';
 
     $('allCorrect').innerHTML = (correct === total)
       ? '<div class="banner-ok">' + esc(T('allCorrect')) + '</div>'
@@ -1013,6 +1114,7 @@
     $('revExplain').textContent = q.explain || T('noExplain');
 
     $('revPrev').disabled = (state.ri === 0);
+    $('revEnd').hidden = (state.ri === total - 1);
     var next = $('revNext');
     if(state.ri === total - 1){
       next.textContent = T('btnEnd');
@@ -1025,6 +1127,11 @@
 
   $('revPrev').addEventListener('click', function(){
     if(state.ri > 0){ state.ri--; renderReview(); }
+  });
+
+  $('revEnd').addEventListener('click', function(){
+    // 提前結束檢視，保留成績與紀錄回到結果結算頁
+    renderResult();
   });
 
   $('revNext').addEventListener('click', function(){
@@ -1045,7 +1152,15 @@
     rerenderActive();
   });
 
+  /* ---------------- 亮色／暗色切換 ---------------- */
+  $('themeToggle').addEventListener('click', function(){
+    var next = (theme === 'dark') ? 'light' : 'dark';
+    applyTheme(next);
+    try{ window.localStorage.setItem(THEME_KEY, next); }catch(e){}
+  });
+
   /* ---------------- 初始化 ---------------- */
+  applyTheme(readStoredTheme());
   applyStatic();
   renderSample();
   showScreen('screen-upload');
