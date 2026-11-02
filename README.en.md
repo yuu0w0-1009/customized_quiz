@@ -74,19 +74,6 @@ File loading page
 
 ---
 
-## Project Structure
-
-```
-.
-├── index.html        # Main program, contains all HTML / CSS / JavaScript
-├── example.json      # Chinese sample quiz bank (3 questions, same as the site's "Download sample JSON" in Chinese mode)
-├── example_eng.json  # English sample quiz bank (3 questions, same as the site's "Download sample JSON" in English mode)
-├── README.md         # Chinese documentation
-└── README.en.md      # English documentation
-```
-
----
-
 ## Tips
 
 - Clicking an option again **deselects** it, returning that question to the unanswered state.
