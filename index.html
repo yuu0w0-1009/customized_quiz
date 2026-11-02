@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>(゜ω゜)=👉自訂題庫測驗 v1.0</title>
+<title>(゜ω゜)=👉自訂題庫測驗 v1.1</title>
 <style>
   :root{
     --primary:#2563eb;
@@ -58,7 +58,8 @@
 
   h1{font-size:24px;margin:0 0 6px;}
   h2{font-size:18px;margin:0 0 12px;}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 24px;}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 6px;}
+  .sub-note{color:var(--muted);font-size:12.5px;margin:0 0 24px;}
 
   /* ---------- 按鈕 ---------- */
   .btn{
@@ -94,6 +95,8 @@
 
   .upload-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:12px 0 10px;}
   .check{display:inline-flex;align-items:center;gap:8px;margin-right:auto;font-size:14px;font-weight:600;cursor:pointer;user-select:none;}
+  .check-group{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-right:auto;}
+  .check-group .check{margin-right:0;}
   .check input{width:17px;height:17px;margin:0;accent-color:var(--primary);cursor:pointer;}
   .fmt{
     margin-top:0;background:#f8fafc;border:1px solid var(--border);
@@ -227,8 +230,9 @@
           <option value="en">English</option>
         </select>
       </div>
-      <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.0</h1>
+      <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.1</h1>
       <p class="sub" data-i18n="uploadSub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
+      <p class="sub-note" data-i18n="uploadNote">※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。</p>
 
       <div class="drop" id="dropZone">
         <div class="drop-title" data-i18n="dropTitle">選擇題庫檔案</div>
@@ -240,10 +244,16 @@
       <div id="uploadMsg"></div>
 
       <div class="upload-actions">
-        <label class="check" id="shuffleWrap" hidden>
-          <input type="checkbox" id="shuffleCheck">
-          <span data-i18n="shuffleLabel">打亂題目</span>
-        </label>
+        <div class="check-group" id="shuffleWrap" hidden>
+          <label class="check">
+            <input type="checkbox" id="shuffleCheck">
+            <span data-i18n="shuffleLabel">打亂題目</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="shuffleOptionsCheck">
+            <span data-i18n="shuffleOptionsLabel">打亂選項</span>
+          </label>
+        </div>
         <button class="btn btn-sm" id="btnSample" data-i18n="btnSample">下載範例 JSON</button>
       </div>
 
@@ -255,6 +265,7 @@
       <div class="log">
         <div style="font-weight:700;margin-bottom:6px;color:#334155;" data-i18n="logTitle">更新說明</div>
         <ul>
+          <li data-i18n="logV2">v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結</li>
           <li data-i18n="logV1">v1.0 初始化自訂題庫測驗網站並新增中英對照</li>
         </ul>
       </div>
@@ -361,15 +372,18 @@
   /* ---------------- 多語系 ---------------- */
   var I18N = {
     zh: {
-      uploadTitle:'自訂題庫測驗 v1.0',
+      uploadTitle:'自訂題庫測驗 v1.1',
       uploadSub:'上傳符合格式的 JSON 題庫檔案，即可開始測驗。',
+      uploadNote:'※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。',
       dropTitle:'選擇題庫檔案',
       dropHint:'將 .json 檔案拖拽到這裡，或點擊下方按鈕選擇',
       btnPick:'選擇 JSON 檔案',
       shuffleLabel:'打亂題目',
+      shuffleOptionsLabel:'打亂選項',
       btnSample:'下載範例 JSON',
       fmtTitle:'JSON 格式範例',
       logTitle:'更新說明',
+      logV2:'v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結',
       logV1:'v1.0 初始化自訂題庫測驗網站並新增中英對照',
       quizNo:'第 {n} 題',
       quizTotal:'共 {t} 題（進度 {i}/{t}）',
@@ -413,15 +427,18 @@
       listSep:'、'
     },
     en: {
-      uploadTitle:'Custom Quiz v1.0',
+      uploadTitle:'Custom Quiz v1.1',
       uploadSub:'Upload a question bank JSON file in the required format to start the quiz.',
+      uploadNote:'※ Explanations are not changed when options are shuffled; the option letters in them may differ from what you see.',
       dropTitle:'Choose a question bank file',
       dropHint:'Drag a .json file here, or click the button below to choose one',
       btnPick:'Choose JSON File',
       shuffleLabel:'Shuffle questions',
+      shuffleOptionsLabel:'Shuffle options',
       btnSample:'Download Sample JSON',
       fmtTitle:'JSON Format Example',
       logTitle:'Changelog',
+      logV2:'v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link',
       logV1:'v1.0 Initial release of the custom quiz site with Chinese/English support',
       quizNo:'Question {n}',
       quizTotal:'{t} question(s) in total (progress {i}/{t})',
@@ -553,21 +570,21 @@
           "題目": "已知 a = 1、b = 2，則 a + b = ?",
           "A": "1", "B": "2", "C": "3", "D": "4",
           "答案": "C",
-          "詳解": "將 a = 1 與 b = 2 相加，1 + 2 = 3，故選 C。"
+          "詳解": "將 a = 1 與 b = 2 相加，1 + 2 = 3，故選 3。"
         },
         {
           "題號": 2,
           "題目": "已知 c = 3、d = 4，則 d - c = ?",
           "A": "1", "B": "2", "C": "3", "D": "4",
           "答案": "A",
-          "詳解": "將 d = 4 減去 c = 3，4 - 3 = 1，故選 A。"
+          "詳解": "將 d = 4 減去 c = 3，4 - 3 = 1，故選 1。"
         },
         {
           "題號": 3,
           "題目": "下列何者是質數？",
           "A": "9", "B": "15", "C": "21", "D": "17",
           "答案": "D",
-          "詳解": "9、15、21 皆可被 3 整除，只有 17 除了 1 與自身外沒有其他因數，故選 D。"
+          "詳解": "9、15、21 皆可被 3 整除，只有 17 除了 1 與自身外沒有其他因數，故選 17。"
         }
       ]
     },
@@ -578,21 +595,21 @@
           "question": "Given a = 1 and b = 2, what is a + b?",
           "A": "1", "B": "2", "C": "3", "D": "4",
           "answer": "C",
-          "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
+          "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is 3."
         },
         {
           "id": 2,
           "question": "Given c = 3 and d = 4, what is d - c?",
           "A": "1", "B": "2", "C": "3", "D": "4",
           "answer": "A",
-          "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is A."
+          "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is 1."
         },
         {
           "id": 3,
           "question": "Which of the following is a prime number?",
           "A": "9", "B": "15", "C": "21", "D": "17",
           "answer": "D",
-          "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is D."
+          "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is 17."
         }
       ]
     }
@@ -683,6 +700,7 @@
     $('fileInput').value = '';
     $('uploadMsg').innerHTML = '';
     $('shuffleCheck').checked = false;
+    $('shuffleOptionsCheck').checked = false;
     $('shuffleWrap').hidden = true;
     lastUpload = null;
     state.questions = [];
@@ -723,9 +741,28 @@
   // 開始（或重新開始）一次測驗
   function startQuiz(){
     if($('shuffleCheck').checked) shuffle(state.questions);
+    if($('shuffleOptionsCheck').checked) state.questions.forEach(shuffleQuestionOptions);
     state.answers = new Array(state.questions.length).fill(null);
     state.qi = 0;
     renderQuiz();
+  }
+
+  // 打亂單一題目的選項：內容重新排列後，依顯示順序重新標為 A、B、C、D
+  // 同時把答案字母改指向正解內容所在的新位置，確保答案與選項仍對應
+  function shuffleQuestionOptions(q){
+    var texts = LABELS.map(function(l){ return q.options[l]; });
+    var correctIdx = LABELS.indexOf(q.answer);   // 找不到有效答案則不變動
+    if(correctIdx === -1) return;
+    var order = LABELS.map(function(_, i){ return i; });
+    shuffle(order);
+    var newOptions = {};
+    var newAnswer = q.answer;
+    LABELS.forEach(function(l, pos){
+      newOptions[l] = texts[order[pos]];
+      if(order[pos] === correctIdx) newAnswer = l;
+    });
+    q.options = newOptions;
+    q.answer = newAnswer;
   }
 
   // Fisher-Yates 洗牌

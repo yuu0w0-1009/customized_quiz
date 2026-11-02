@@ -1,4 +1,4 @@
-# [Custom Quiz Bank v1.0](https://yuu0w0-1009.github.io/customized_quiz/)
+# [Custom Quiz Bank v1.1](https://yuu0w0-1009.github.io/customized_quiz/)
 [中文](README.md) ｜ **English**
 
 A purely front-end static website for "custom quiz banks"
@@ -28,7 +28,7 @@ A purely front-end static website for "custom quiz banks"
       "C": "3",
       "D": "4",
       "answer": "C",
-      "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
+      "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is 3."
     }
   ]
 }
@@ -84,4 +84,5 @@ File loading page
 
 ## Changelog
 
+- v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link
 - v1.0 Initial release of the custom quiz site with Chinese/English support

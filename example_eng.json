@@ -8,7 +8,7 @@
             "C": "3",
             "D": "4",
             "answer": "C",
-            "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is C."
+            "explanation": "Add a = 1 and b = 2, so 1 + 2 = 3. The answer is 3."
         },
         {
             "id": 2,
@@ -18,7 +18,7 @@
             "C": "3",
             "D": "4",
             "answer": "A",
-            "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is A."
+            "explanation": "Subtract c = 3 from d = 4, so 4 - 3 = 1. The answer is 1."
         },
         {
             "id": 3,
@@ -28,7 +28,7 @@
             "C": "21",
             "D": "17",
             "answer": "D",
-            "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is D."
+            "explanation": "9, 15 and 21 are all divisible by 3. Only 17 has no divisors other than 1 and itself, so the answer is 17."
         }
     ]
 }
