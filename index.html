@@ -198,6 +198,41 @@
 
   .qtext{font-size:19px;font-weight:700;margin:0 0 20px;white-space:pre-wrap;}
 
+  /* ---------- Markdown：程式碼與數學公式 ---------- */
+  .md-code{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;
+    padding:10px 12px;margin:10px 0;overflow:auto;
+    font-size:13px;font-weight:400;line-height:1.6;white-space:pre;
+  }
+  .md-code code,.md-icode{font-family:ui-monospace,Consolas,"Courier New",monospace;font-weight:400;}
+  .md-icode{
+    background:var(--chip);border:1px solid var(--border);border-radius:4px;
+    padding:1px 5px;font-size:.9em;
+  }
+  .math-inline,.math-block{font-family:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;}
+  .math-inline sup,.math-inline sub,
+  .math-block sup,.math-block sub{font-size:.72em;}
+  .math-block{display:block;text-align:center;margin:12px 0;font-size:1.05em;}
+  .mfrac{
+    display:inline-flex;flex-direction:column;vertical-align:middle;
+    text-align:center;font-size:.95em;margin:0 .15em;
+  }
+  .mfrac > .mnum{padding-bottom:2px;}
+  .mfrac > .mden{border-top:1px solid currentColor;padding-top:2px;}
+  .msqrt{display:inline-flex;align-items:flex-start;}
+  .msqrt > .mroot{font-size:.6em;margin-right:-2px;}
+  .msqrt > .mrad{border-top:1px solid currentColor;padding:1px 3px 0;}
+  .mover{border-top:1px solid currentColor;padding-top:1px;}
+  .munder{border-bottom:1px solid currentColor;padding-bottom:1px;}
+  .maccent{position:relative;display:inline-block;}
+  .maccent > .maccent-mark{
+    position:absolute;top:-.72em;left:50%;transform:translateX(-50%);
+    font-size:.7em;line-height:1;
+  }
+  .mop,.mtext{font-style:normal;}
+  .mspace{display:inline-block;width:.17em;}
+  .mspace-lg{width:1em;}
+
   .options{display:flex;flex-direction:column;gap:12px;}
   .option{
     display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
@@ -663,6 +698,172 @@
     });
   }
 
+  /* ---------------- Markdown：程式碼與數學公式 ---------------- */
+  // 支援 ``` 程式碼區塊、`行內程式碼`、$...$ 行內數學、$$...$$ 區塊數學
+  var TEX_FUNCS = {
+    sin:'sin', cos:'cos', tan:'tan', cot:'cot', sec:'sec', csc:'csc',
+    arcsin:'arcsin', arccos:'arccos', arctan:'arctan',
+    sinh:'sinh', cosh:'cosh', tanh:'tanh',
+    log:'log', ln:'ln', lg:'lg', exp:'exp', lim:'lim',
+    max:'max', min:'min', sup:'sup', inf:'inf', det:'det', dim:'dim',
+    gcd:'gcd', lcm:'lcm', deg:'deg', arg:'arg', mod:'mod', bmod:'mod', Pr:'Pr'
+  };
+
+  var TEX_SYMBOLS = {
+    alpha:'α', beta:'β', gamma:'γ', delta:'δ', epsilon:'ε', varepsilon:'ε',
+    zeta:'ζ', eta:'η', theta:'θ', vartheta:'ϑ', iota:'ι', kappa:'κ', lambda:'λ',
+    mu:'μ', nu:'ν', xi:'ξ', pi:'π', varpi:'ϖ', rho:'ρ', sigma:'σ', tau:'τ',
+    upsilon:'υ', phi:'φ', varphi:'ϕ', chi:'χ', psi:'ψ', omega:'ω',
+    Gamma:'Γ', Delta:'Δ', Theta:'Θ', Lambda:'Λ', Xi:'Ξ', Pi:'Π', Sigma:'Σ',
+    Upsilon:'Υ', Phi:'Φ', Psi:'Ψ', Omega:'Ω',
+    times:'×', div:'÷', pm:'±', mp:'∓', cdot:'·', ast:'∗', star:'⋆',
+    le:'≤', leq:'≤', ge:'≥', geq:'≥', ne:'≠', neq:'≠', equiv:'≡',
+    approx:'≈', sim:'∼', simeq:'≃', propto:'∝', infty:'∞',
+    partial:'∂', nabla:'∇', sum:'∑', prod:'∏', int:'∫', oint:'∮',
+    to:'→', rightarrow:'→', Rightarrow:'⇒', leftarrow:'←', Leftarrow:'⇐',
+    leftrightarrow:'↔', Leftrightarrow:'⇔', mapsto:'↦',
+    in:'∈', notin:'∉', ni:'∋', subset:'⊂', subseteq:'⊆', supset:'⊃',
+    supseteq:'⊇', cup:'∪', cap:'∩', emptyset:'∅', varnothing:'∅',
+    forall:'∀', exists:'∃', neg:'¬', land:'∧', lor:'∨',
+    angle:'∠', perp:'⊥', parallel:'∥', triangle:'△', square:'□', circ:'∘', degree:'°',
+    ldots:'…', cdots:'⋯', dots:'…', vdots:'⋮', ddots:'⋱',
+    therefore:'∴', because:'∵', prime:'′',
+    lbrace:'{', rbrace:'}', vert:'|', Vert:'‖', langle:'⟨', rangle:'⟩'
+  };
+
+  var TEX_ACCENTS = {
+    vec:'→', bar:'‾', hat:'^', widehat:'^',
+    dot:'˙', ddot:'¨', tilde:'~', widetilde:'~'
+  };
+
+  // 將 LaTeX 子集轉為 HTML（上下標、分數、根號、希臘字母、運算子…）
+  function texToHtml(src){
+    var i = 0;
+    var text = String(src);
+
+    function readArg(){
+      // 讀取單一原子：{...} 群組、\指令，或單一字元
+      if(text[i] === '{'){
+        i++;
+        var group = readSeq();
+        if(text[i] === '}') i++;
+        return group;
+      }
+      if(text[i] === '\\') return readCmd();
+      if(i >= text.length) return '';
+      var ch = text[i];
+      i++;
+      return esc(ch);
+    }
+
+    function readSeq(){
+      var out = '';
+      while(i < text.length && text[i] !== '}'){
+        var c = text[i];
+        if(c === '{'){
+          i++;
+          out += readSeq();
+          if(text[i] === '}') i++;
+        }else if(c === '^'){
+          i++;
+          out += '<sup>' + readArg() + '</sup>';
+        }else if(c === '_'){
+          i++;
+          out += '<sub>' + readArg() + '</sub>';
+        }else if(c === '\\'){
+          out += readCmd();
+        }else{
+          i++;
+          out += (c === '\n' ? ' ' : esc(c));
+        }
+      }
+      return out;
+    }
+
+    function readCmd(){
+      i++;                                   // 略過反斜線
+      var m = /^[a-zA-Z]+/.exec(text.slice(i));
+      var name = m ? m[0] : text.charAt(i);  // 單字元指令（\, \{ \$ …）
+      i += name.length;
+
+      if(name === '{' || name === '}' || name === '%' || name === '&' ||
+         name === '#' || name === '_' || name === '$') return esc(name);
+      if(name === ',' || name === ':' || name === ';' || name === ' ') return '<span class="mspace"></span>';
+      if(name === '!') return '';
+      if(name === 'quad' || name === 'qquad') return '<span class="mspace mspace-lg"></span>';
+      if(name === 'frac' || name === 'dfrac' || name === 'tfrac'){
+        var num = readArg();
+        var den = readArg();
+        return '<span class="mfrac"><span class="mnum">' + num + '</span>' +
+               '<span class="mden">' + den + '</span></span>';
+      }
+      if(name === 'sqrt'){
+        var root = '';
+        if(text[i] === '['){
+          var close = text.indexOf(']', i);
+          if(close > -1){ root = text.slice(i + 1, close); i = close + 1; }
+        }
+        var body = readArg();
+        return '<span class="msqrt">' +
+               (root ? '<sup class="mroot">' + texToHtml(root) + '</sup>' : '') +
+               '<span class="msign">√</span><span class="mrad">' + body + '</span></span>';
+      }
+      if(name === 'text' || name === 'mathrm' || name === 'operatorname' ||
+         name === 'mathbf' || name === 'mathit' || name === 'mathsf' || name === 'mathtt'){
+        return '<span class="mtext">' + readArg() + '</span>';
+      }
+      if(name === 'overline') return '<span class="mover">' + readArg() + '</span>';
+      if(name === 'underline') return '<span class="munder">' + readArg() + '</span>';
+      if(TEX_ACCENTS[name]) return '<span class="maccent"><span class="maccent-mark">' +
+                                   TEX_ACCENTS[name] + '</span>' + readArg() + '</span>';
+      if(name === 'left' || name === 'right' || name === 'big' || name === 'Big' ||
+         name === 'bigg' || name === 'Bigg'){
+        if(text[i] === '.'){ i++; return ''; }   // 隱藏的分隔符號
+        return '';                               // 後方括號交由一般字元處理
+      }
+      if(name === 'displaystyle' || name === 'textstyle' || name === 'limits' || name === 'nolimits') return '';
+      if(TEX_FUNCS[name]) return '<span class="mop">' + TEX_FUNCS[name] + '</span>';
+      if(TEX_SYMBOLS[name] !== undefined) return esc(TEX_SYMBOLS[name]);
+      return esc('\\' + name);                   // 不支援的指令原樣顯示
+    }
+
+    return readSeq();
+  }
+
+  // 將題目文字轉為 HTML：程式碼與數學公式會渲染，其餘內容一律轉義
+  function md(text){
+    if(text === undefined || text === null) return '';
+    var src = String(text);
+    if(!src) return '';
+
+    var store = [];
+    function keep(html){
+      store.push(html);
+      return '\u0000' + (store.length - 1) + '\u0000';
+    }
+
+    // 1) 程式碼區塊
+    src = src.replace(/```[^\n`]*\n([\s\S]*?)```/g, function(_, code){
+      return keep('<pre class="md-code"><code>' + esc(code.replace(/\n+$/, '')) + '</code></pre>');
+    });
+    // 2) 行內程式碼
+    src = src.replace(/`([^`\n]+)`/g, function(_, code){
+      return keep('<code class="md-icode">' + esc(code) + '</code>');
+    });
+    // 3) 區塊數學
+    src = src.replace(/\$\$([\s\S]+?)\$\$/g, function(_, tex){
+      return keep('<span class="math-block">' + texToHtml(tex) + '</span>');
+    });
+    // 4) 行內數學（開頭前需非反斜線，可用 \$ 表示字面上的錢字號）
+    src = src.replace(/(^|[^\\])\$([^\s$](?:[^$\n]*[^\s$])?)\$/g, function(_, pre, tex){
+      return pre + keep('<span class="math-inline">' + texToHtml(tex) + '</span>');
+    });
+    // 5) 其餘文字轉義並保留換行
+    src = esc(src).replace(/\\\$/g, '$').replace(/\n/g, '<br>');
+    // 6) 還原已渲染的片段
+    return src.replace(/\u0000(\d+)\u0000/g, function(_, n){ return store[+n]; });
+  }
+
   function showScreen(name){
     activeScreen = name;
     ['screen-upload','screen-quiz','screen-result','screen-review'].forEach(function(id){
@@ -964,7 +1165,7 @@
       state.qi = n;
       renderQuiz();
     });
-    $('quizText').textContent = q.title;
+    $('quizText').innerHTML = md(q.title);
 
     var box = $('quizOptions');
     box.innerHTML = '';
@@ -972,7 +1173,7 @@
       var btn = document.createElement('button');
       btn.className = 'option' + (state.answers[state.qi] === l ? ' selected' : '');
       btn.innerHTML = '<span class="badge">' + l + '</span>' +
-                      '<span class="otext">' + esc(q.options[l] || '') + '</span>';
+                      '<span class="otext">' + md(q.options[l] || '') + '</span>';
       btn.addEventListener('click', function(){
         // 點擊可選取或切換答案
         state.answers[state.qi] = (state.answers[state.qi] === l) ? null : l;
@@ -1077,15 +1278,15 @@
         return '' +
         '<div class="wrong-item">' +
           '<div class="wrong-head"><span class="no">' + esc(T('quizNo', {n: i + 1})) + '</span>' +
-            '<span>' + esc(q.title) + '</span></div>' +
+            '<span>' + md(q.title) + '</span></div>' +
           '<div class="wrong-body">' +
             '<p class="kv"><b class="lbl">' + esc(T('labelYourAnswer')) + '</b>' +
               '<b class="' + (mine ? 'bad' : '') + '">' +
-              (mine ? esc(mine) + '. ' + esc(q.options[mine] || '') : esc(T('notAnswered'))) + '</b></p>' +
+              (mine ? esc(mine) + '. ' + md(q.options[mine] || '') : esc(T('notAnswered'))) + '</b></p>' +
             '<p class="kv"><b class="lbl">' + esc(T('labelCorrect')) + '</b><b class="good">' +
-              esc(q.answer) + '. ' + esc(q.options[q.answer] || '') + '</b></p>' +
+              esc(q.answer) + '. ' + md(q.options[q.answer] || '') + '</b></p>' +
             '<div class="wrong-explain"><b class="lbl">' + esc(T('labelExplain2')) + '</b>' +
-              esc(q.explain || T('noExplain')) + '</div>' +
+              md(q.explain || T('noExplain')) + '</div>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -1120,7 +1321,7 @@
       state.ri = n;
       renderReview();
     });
-    $('revText').textContent = q.title;
+    $('revText').innerHTML = md(q.title);
 
     var box = $('revOptions');
     box.innerHTML = '';
@@ -1138,7 +1339,7 @@
       btn.className = cls;
       btn.disabled = true;
       btn.innerHTML = '<span class="badge">' + l + '</span>' +
-                      '<span class="otext">' + esc(q.options[l] || '') + '</span>' + tag;
+                      '<span class="otext">' + md(q.options[l] || '') + '</span>' + tag;
       box.appendChild(btn);
     });
 
@@ -1146,7 +1347,7 @@
     boxEl.className = 'answer-box ' + (isRight ? 'ok' : 'no');
     $('revMineText').textContent = mine ? mine : T('notAnswered');
     $('revAnswerText').textContent = q.answer || T('noAnswer');
-    $('revExplain').textContent = q.explain || T('noExplain');
+    $('revExplain').innerHTML = md(q.explain || T('noExplain'));
 
     $('revPrev').disabled = (state.ri === 0);
     $('revEnd').hidden = (state.ri === total - 1);
