@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>(゜ω゜)=👉自訂題庫測驗 v1.2</title>
+<title>(゜ω゜)=👉自訂題庫測驗 v1.3</title>
 <style>
   :root{
     --title-size:24px;               /* 標題字級，同時用來對齊語言／主題選擇欄的高度 */
@@ -333,7 +333,7 @@
     <div class="card">
       <div class="upload-head">
         <div class="head-text">
-          <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.2</h1>
+          <h1 data-i18n="uploadTitle">自訂題庫測驗 v1.3</h1>
           <p class="sub" data-i18n="uploadSub">上傳符合格式的 JSON 題庫檔案，即可開始測驗。</p>
           <p class="sub-note" data-i18n="uploadNote">※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。</p>
         </div>
@@ -377,6 +377,7 @@
       <div class="log">
         <div style="font-weight:700;margin-bottom:6px;color:var(--text-2);" data-i18n="logTitle">更新說明</div>
         <ul>
+          <li data-i18n="logV4">v1.3 題目、選項與詳解支援 Markdown（程式碼與數學公式），進度欄可直接輸入題號跳題，並在觀看全部詳解新增「結束」按鈕</li>
           <li data-i18n="logV3">v1.2 新增亮色／暗色模式切換（會記住選擇），優化UI</li>
           <li data-i18n="logV2">v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結</li>
           <li data-i18n="logV1">v1.0 初始化自訂題庫測驗網站並新增中英對照</li>
@@ -486,7 +487,7 @@
   /* ---------------- 多語系 ---------------- */
   var I18N = {
     zh: {
-      uploadTitle:'自訂題庫測驗 v1.2',
+      uploadTitle:'自訂題庫測驗 v1.3',
       uploadSub:'上傳符合格式的 JSON 題庫檔案，即可開始測驗。',
       uploadNote:'※ 打亂選項後，詳解內容不會跟著變動，當中的選項字母可能與畫面不同。',
       dropTitle:'選擇題庫檔案',
@@ -497,6 +498,7 @@
       btnSample:'下載範例 JSON',
       fmtTitle:'JSON 格式範例',
       logTitle:'更新說明',
+      logV4:'v1.3 題目、選項與詳解支援 Markdown（程式碼與數學公式），進度欄可直接輸入題號跳題，並在觀看全部詳解新增「結束」按鈕',
       logV3:'v1.2 新增亮色／暗色模式切換（會記住選擇），優化UI',
       logV2:'v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結',
       logV1:'v1.0 初始化自訂題庫測驗網站並新增中英對照',
@@ -545,7 +547,7 @@
       listSep:'、'
     },
     en: {
-      uploadTitle:'Custom Quiz v1.2',
+      uploadTitle:'Custom Quiz v1.3',
       uploadSub:'Upload a question bank JSON file in the required format to start the quiz.',
       uploadNote:'※ Explanations are not changed when options are shuffled; the option letters in them may differ from what you see.',
       dropTitle:'Choose a question bank file',
@@ -556,6 +558,7 @@
       btnSample:'Download Sample JSON',
       fmtTitle:'JSON Format Example',
       logTitle:'Changelog',
+      logV4:'v1.3 Markdown support (code blocks and math formulas) for questions, options, and explanations; jump to any question by typing its number; added a "Finish" button on the review page',
       logV3:'v1.2 Added a light/dark mode toggle (your choice is remembered) and optimize UI',
       logV2:'v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link',
       logV1:'v1.0 Initial release of the custom quiz site with Chinese/English support',

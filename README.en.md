@@ -1,4 +1,4 @@
-# [Custom Quiz Bank v1.2](https://yuu0w0-1009.github.io/customized_quiz/)
+# [Custom Quiz Bank v1.3](https://yuu0w0-1009.github.io/customized_quiz/)
 [中文](README.md) ｜ **English**
 
 A purely front-end static website for "custom quiz banks"
@@ -7,11 +7,14 @@ A purely front-end static website for "custom quiz banks"
 
 ---
 ## Main Features
-1. Customizable quiz bank
-2. Shuffle questions
-3. Answer progress tracking
-4. Result statistics
-5. Wrong answer review
+1. Customizable quiz bank (upload a JSON file to start; field aliases accept Chinese and English)
+2. Shuffle questions and shuffle options (each optional; the correct answer is re-mapped after shuffling)
+3. Answer progress tracking (jump to any question from a dropdown menu)
+4. Result statistics (accuracy and score)
+5. Wrong answer review (view all explanations, review question by question, quick finish)
+6. Chinese/English interface switch
+7. Light/dark mode toggle (your choice is remembered)
+8. Markdown support (code blocks and math formulas) for questions, options, and explanations
 
 ## Quiz Bank JSON Format
 
@@ -91,6 +94,7 @@ File loading page
 
 ## Changelog
 
+- v1.3 Markdown support (code blocks and math formulas) for questions, options, and explanations; jump to any question by typing its number; added a "Finish" button on the review page
 - v1.2 Added a light/dark mode toggle (your choice is remembered) and optimized UI
 - v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link
 - v1.0 Initial release of the custom quiz site with Chinese/English support
