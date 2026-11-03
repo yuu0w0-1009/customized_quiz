@@ -185,6 +185,14 @@
   .qmeta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
   .qno{font-weight:700;color:var(--primary);font-size:15px;}
   .qtotal{color:var(--muted);font-size:13px;}
+  .qtotal .jump-sel{
+    font-family:inherit;font-size:13px;font-weight:700;line-height:1.2;
+    color:var(--primary);background:var(--surface);
+    border:1px solid var(--border);border-radius:6px;
+    width:3.6em;padding:1px 2px;margin:0 2px;text-align:center;cursor:pointer;
+  }
+  .qtotal .jump-sel:hover{border-color:var(--line-hover);}
+  .qtotal .jump-sel:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15);}
   .bar{height:6px;background:var(--track);border-radius:99px;overflow:hidden;margin:10px 0 22px;}
   .bar > i{display:block;height:100%;background:var(--primary);width:0;transition:width .25s ease;}
 
@@ -458,7 +466,8 @@
       logV2:'v1.1 新增「打亂選項」功能（打亂後重新編號並自動對應正解）、英文範例題庫下載與 GitHub 連結',
       logV1:'v1.0 初始化自訂題庫測驗網站並新增中英對照',
       quizNo:'第 {n} 題',
-      quizTotal:'共 {t} 題（進度 {i}/{t}）',
+      quizTotal:'共 {t} 題（進度 {jump}/{t}）',
+      jumpLabel:'跳至指定題號',
       btnPrev:'上一題',
       btnNext:'下一題',
       btnSubmit:'交卷',
@@ -516,7 +525,8 @@
       logV2:'v1.1 Added "Shuffle options" (options are renumbered with the answer auto-mapped), the English sample download, and a GitHub link',
       logV1:'v1.0 Initial release of the custom quiz site with Chinese/English support',
       quizNo:'Question {n}',
-      quizTotal:'{t} question(s) in total (progress {i}/{t})',
+      quizTotal:'{t} question(s) in total (progress {jump}/{t})',
+      jumpLabel:'Jump to question',
       btnPrev:'Previous',
       btnNext:'Next',
       btnSubmit:'Submit',
@@ -918,10 +928,29 @@
   }
 
   /* ---------------- 共用：渲染題目卡 ---------------- */
-  function fillMeta(noEl, totalEl, barEl, index, total){
+  function fillMeta(noEl, totalEl, barEl, index, total, onJump){
     // 題號一律依「測驗呈現順序」編號，避免打亂題目後題號跳號
     noEl.textContent = T('quizNo', {n: index + 1});
-    totalEl.textContent = T('quizTotal', {t: total, i: index + 1});
+
+    // 進度以題號下拉選單呈現，點開即列出所有題號；也可直接以鍵盤輸入數字跳題
+    var opts = '';
+    for(var i=1;i<=total;i++){
+      opts += '<option value="' + i + '"' + (i === index + 1 ? ' selected' : '') + '>' + i + '</option>';
+    }
+    totalEl.innerHTML = T('quizTotal', {
+      t: total,
+      jump: '<select class="jump-sel" aria-label="' + esc(T('jumpLabel')) + '">' + opts + '</select>'
+    });
+
+    var jumpEl = totalEl.querySelector('.jump-sel');
+    if(jumpEl){
+      jumpEl.addEventListener('change', function(){
+        // 以滑鼠挑選或以鍵盤輸入數字選取後跳題
+        var v = parseInt(jumpEl.value, 10);
+        if(v - 1 !== index) onJump(v - 1);
+      });
+    }
+
     barEl.style.width = ((index + 1) / total * 100) + '%';
   }
 
@@ -931,7 +960,10 @@
     var q = state.questions[state.qi];
     var total = state.questions.length;
 
-    fillMeta($('quizNo'), $('quizTotal'), $('quizBar'), state.qi, total);
+    fillMeta($('quizNo'), $('quizTotal'), $('quizBar'), state.qi, total, function(n){
+      state.qi = n;
+      renderQuiz();
+    });
     $('quizText').textContent = q.title;
 
     var box = $('quizOptions');
@@ -1084,7 +1116,10 @@
     var mine = state.answers[state.ri];
     var isRight = (!!mine && mine === q.answer);
 
-    fillMeta($('revNo'), $('revTotal'), $('revBar'), state.ri, total);
+    fillMeta($('revNo'), $('revTotal'), $('revBar'), state.ri, total, function(n){
+      state.ri = n;
+      renderReview();
+    });
     $('revText').textContent = q.title;
 
     var box = $('revOptions');
